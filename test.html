@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>knot-viewer test</title>
+<link rel="stylesheet" href="shared.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script src="web-components.js"></script>
+<style>
+  body { --accent: var(--accent-braid); }
+  body::before {
+    background:
+      radial-gradient(ellipse at 30% 15%, rgba(232,200,106,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 85%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1.25rem;
+  }
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .card code {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    word-break: break-all;
+  }
+  knot-viewer { margin: 0 auto; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>&lt;knot-viewer&gt; <em>Test</em></h1>
+    <div class="subtitle">3D braid closure rendering with Three.js</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1. Trefoil preset -->
+    <div class="card">
+      <div class="card-title">Trefoil (preset, interactive, auto-rotate)</div>
+      <knot-viewer preset="trefoil" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="trefoil" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 2. Figure-eight preset -->
+    <div class="card">
+      <div class="card-title">Figure-Eight (preset, interactive)</div>
+      <knot-viewer preset="figure-eight" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="figure-eight" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 3. Hopf link — 2-component, different colors -->
+    <div class="card">
+      <div class="card-title">Hopf Link (2-component link)</div>
+      <knot-viewer preset="hopf" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="hopf" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 4. Cinquefoil via custom braid attribute -->
+    <div class="card">
+      <div class="card-title">Cinquefoil (custom braid word)</div>
+      <knot-viewer braid="1,1,1,1,1" strands="2" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer braid="1,1,1,1,1" strands="2" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 5. Left-handed trefoil with custom color -->
+    <div class="card">
+      <div class="card-title">Left Trefoil (custom color, auto-rotate only)</div>
+      <knot-viewer preset="trefoil-left" color="#e07070" auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="trefoil-left" color="#e07070" auto-rotate&gt;</code>
+    </div>
+
+    <!-- 6. Unknot -->
+    <div class="card">
+      <div class="card-title">Unknot (empty braid)</div>
+      <knot-viewer preset="unknot" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="unknot" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 7. Custom size and tube radius -->
+    <div class="card">
+      <div class="card-title">Figure-Eight (custom size, thick tube)</div>
+      <knot-viewer preset="figure-eight" color="#c4a0e8" tube-radius="0.18"
+                   width="380" height="300" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="figure-eight" color="#c4a0e8" tube-radius="0.18" width="380" height="300"&gt;</code>
+    </div>
+
+    <!-- 8. JS API test: custom parametric curve -->
+    <div class="card">
+      <div class="card-title">JS API — custom parametric curve (torus knot)</div>
+      <knot-viewer id="customCurve" color="#7bc77b" interactive auto-rotate></knot-viewer>
+      <code>viewer.curve = function(t) { /* torus knot (3,2) */ }</code>
+    </div>
+
+    <!-- 9. Smooth mode: Trefoil -->
+    <div class="card">
+      <div class="card-title">Trefoil — smooth mode (energy minimized)</div>
+      <knot-viewer preset="trefoil" mode="smooth" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="trefoil" mode="smooth" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 10. Smooth mode: Hopf link -->
+    <div class="card">
+      <div class="card-title">Hopf Link — smooth mode (2-component)</div>
+      <knot-viewer preset="hopf" mode="smooth" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="hopf" mode="smooth" interactive auto-rotate&gt;</code>
+    </div>
+
+    <!-- 11. Smooth mode: Figure-Eight -->
+    <div class="card">
+      <div class="card-title">Figure-Eight — smooth mode (energy minimized)</div>
+      <knot-viewer preset="figure-eight" mode="smooth" interactive auto-rotate></knot-viewer>
+      <code>&lt;knot-viewer preset="figure-eight" mode="smooth" interactive auto-rotate&gt;</code>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// JS API test: set a custom parametric curve (trefoil as torus knot)
+var viewer = document.getElementById('customCurve');
+viewer.curve = function (t) {
+  var a = t * Math.PI * 2;
+  var r = 1 + 0.5 * Math.cos(3 * a);
+  return [
+    r * Math.cos(2 * a),
+    r * Math.sin(2 * a),
+    0.5 * Math.sin(3 * a)
+  ];
+};
+</script>
+</body>
+</html>

@@ -10,8 +10,8 @@
   body { --accent: var(--accent-braid); }
   body::before {
     background:
-      radial-gradient(ellipse at 30% 15%, rgba(232,200,106,0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 70% 85%, rgba(196,160,232,0.03) 0%, transparent 50%);
+      radial-gradient(ellipse at 30% 15%, rgba(235,182,0,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 85%, rgba(125,93,125,0.04) 0%, transparent 50%);
   }
 </style>
 </head>
@@ -114,7 +114,7 @@
 
     <div class="figure">
       <canvas id="figBraidSmoothing" width="700" height="200"></canvas>
-      <div class="figure-caption">A positive crossing σ₁ and its two resolutions. <span style="color:#5b9bd5">A-smoothing</span>: strands cup together. <span style="color:#d4845a">B-smoothing</span>: strands pass straight through.</div>
+      <div class="figure-caption">A positive crossing σ₁ and its two resolutions. <span class="color-a">A-smoothing</span>: strands cup together. <span class="color-b">B-smoothing</span>: strands pass straight through.</div>
     </div>
 
     <p>After resolving all crossings and adding the closure arcs, we count connected components — the loops. The weight is exactly as before: <em>A</em><sup>(#A−#B)</sup> · <em>d</em><sup>(loops−1)</sup> where <em>d</em> = −<em>A</em>² − <em>A</em>⁻².</p>
@@ -473,7 +473,11 @@ function currentState() {
 /* ============================================================
  * DRAWING: Explanatory figures
  * ============================================================ */
-var COL_A = '#5b9bd5', COL_B = '#d4845a', COL_BRAID = '#e8c86a', COL_BRAID2 = '#c4a0e8';
+var COL_A=getCSSColor('--accent-a'), COL_B=getCSSColor('--accent-b');
+var COL_BRAID=getCSSColor('--accent-braid'), COL_BRAID2=getCSSColor('--accent-poly');
+var COL_DIM=getCSSColor('--text-dim'), COL_NEG=getCSSColor('--negative');
+var COL_MGREEN=getCSSColor('--medium-green'), COL_MGOLD=getCSSColor('--medium-gold');
+var COL_LOOP=getCSSColor('--accent-loop'), COL_HI=getCSSColor('--highlight');
 
 function drawBraidStrands(ctx, x, y, w, h, word, nStrands, colors) {
   /* Draw a braid diagram given a word array */
@@ -482,7 +486,7 @@ function drawBraidStrands(ctx, x, y, w, h, word, nStrands, colors) {
   var baseX = x + (w - (nStrands - 1) * strandGap) / 2;
   var cols = colors || [];
   if (!cols.length) {
-    var defaults = [COL_BRAID, COL_BRAID2, '#7bc77b', '#e06070', '#5b9bd5'];
+    var defaults = [COL_BRAID, COL_BRAID2, COL_MGREEN, COL_NEG, COL_A];
     for (var i = 0; i < nStrands; i++) cols[i] = defaults[i % defaults.length];
   }
 
@@ -568,7 +572,7 @@ function drawFigBraidBasic() {
 
   /* Single sigma_1 */
   ctx.font = '11px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.textAlign = 'center';
   ctx.fillText('σ₁ (2 strands)', 100, h - 10);
   drawBraidStrands(ctx, 40, 10, 120, 160, [1], 2);
@@ -590,13 +594,13 @@ function drawFigClosure() {
 
   /* Open braid */
   ctx.font = '11px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.textAlign = 'center';
   ctx.fillText('open braid', 150, h - 10);
   drawBraidStrands(ctx, 80, 20, 140, 180, [1, 1, 1], 2);
 
   /* Arrow */
-  ctx.strokeStyle = '#6b7394';
+  ctx.strokeStyle = COL_DIM;
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(260, h/2); ctx.lineTo(290, h/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(287, h/2-3); ctx.lineTo(290, h/2); ctx.lineTo(287, h/2+3); ctx.stroke();
@@ -605,7 +609,7 @@ function drawFigClosure() {
   /* Closed braid (schematic trefoil) */
   var cx = 430, cy = h/2;
   /* Draw closure arcs on right side */
-  ctx.strokeStyle = 'rgba(232,200,106,0.3)';
+  ctx.strokeStyle = hexToRgba(COL_BRAID,0.3);
   ctx.lineWidth = 1.5;
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
@@ -632,12 +636,12 @@ function drawFigBraidSmoothing() {
   /* Original crossing */
   var ox = 120;
   ctx.font = '11px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillStyle = COL_DIM; ctx.textAlign = 'center';
   drawBraidStrands(ctx, ox - 40, 30, 80, 120, [1], 2);
   ctx.fillText('σ₁ crossing', ox, h - 10);
 
   /* Arrow */
-  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.strokeStyle = COL_DIM; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(200, cy); ctx.lineTo(220, cy); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(217, cy-3); ctx.lineTo(220, cy); ctx.lineTo(217, cy+3); ctx.stroke();
 
@@ -657,11 +661,11 @@ function drawFigBraidSmoothing() {
   ctx.fillStyle = COL_A;
   ctx.fillText('A-smoothing', ax, h - 10);
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.fillText('(cup: strands join)', ax, h - 0);
 
   /* Arrow */
-  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.strokeStyle = COL_DIM; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(390, cy); ctx.lineTo(410, cy); ctx.stroke();
 
   /* B-smoothing: straight */
@@ -673,7 +677,7 @@ function drawFigBraidSmoothing() {
   ctx.fillStyle = COL_B;
   ctx.fillText('B-smoothing', bx, h - 10);
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.fillText('(straight through)', bx, h - 0);
 }
 
@@ -689,14 +693,14 @@ function drawFigChirality() {
   ctx.fillStyle = COL_BRAID; ctx.textAlign = 'center';
   ctx.fillText('σ₁³', 100, h - 20);
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.fillText('right-handed', 100, h - 8);
 
   /* Mirror arrow */
-  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillStyle = COL_DIM; ctx.textAlign = 'center';
   ctx.font = '11px "Crimson Pro", serif';
   ctx.fillText('mirror', 265, h/2 - 10);
-  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.strokeStyle = COL_DIM; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(215, h/2); ctx.lineTo(310, h/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(220, h/2); ctx.lineTo(225, h/2-4); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(220, h/2); ctx.lineTo(225, h/2+4); ctx.stroke();
@@ -709,17 +713,17 @@ function drawFigChirality() {
   ctx.fillStyle = COL_B; ctx.textAlign = 'center';
   ctx.fillText('σ₁⁻³', 390, h - 20);
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.fillText('left-handed', 390, h - 8);
 
   /* ≠ */
   ctx.font = '20px "Crimson Pro", serif';
-  ctx.fillStyle = '#e06070';
+  ctx.fillStyle = COL_NEG;
   ctx.fillText('≠', 265, h/2 + 35);
 
   /* Figure-eight note */
   ctx.font = '10px "Crimson Pro", serif';
-  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillStyle = COL_DIM; ctx.textAlign = 'center';
   ctx.fillText('Figure-eight: palindromic bracket → amphichiral (= its own mirror)', 560, h/2);
 }
 
@@ -734,7 +738,7 @@ function drawCrossing(canvas, index, isB) {
   var braid = BRAIDS[currentBraid];
   var sign = braid.word[index] > 0 ? 1 : -1;
 
-  ctx.fillStyle = isB ? 'rgba(212,132,90,0.06)' : 'rgba(91,155,213,0.06)';
+  ctx.fillStyle = isB ? hexToRgba(COL_B,0.06) : hexToRgba(COL_A,0.06);
   ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, Math.PI * 2); ctx.fill();
 
   ctx.lineWidth = 2.5; ctx.lineCap = 'round';
@@ -768,7 +772,7 @@ function drawCrossing(canvas, index, isB) {
 
   /* Sign indicator */
   ctx.font = '8px "JetBrains Mono", monospace';
-  ctx.fillStyle = sign > 0 ? 'rgba(232,200,106,0.5)' : 'rgba(212,132,90,0.5)';
+  ctx.fillStyle = sign > 0 ? hexToRgba(COL_BRAID,0.5) : hexToRgba(COL_B,0.5);
   ctx.textAlign = 'center';
   ctx.fillText(sign > 0 ? '+' : '−', cx, cy - r - 4);
 }
@@ -779,7 +783,7 @@ function drawLoops(braid, state) {
   ctx.clearRect(0, 0, w, h);
 
   var loops = braidCountLoops(braid, state);
-  var colors = ['#7bc77b','#5b9bd5','#d4845a','#c4a0e8','#f0d060','#e06070','#60c0c0'];
+  var colors = [COL_LOOP,COL_A,COL_B,COL_BRAID2,COL_HI,COL_NEG,COL_MGREEN];
   var spacing = Math.min(80, (w - 40) / Math.max(loops, 1));
   var startX = w/2 - (loops - 1) * spacing / 2;
 
@@ -795,7 +799,7 @@ function drawLoops(braid, state) {
     ctx.fillText('loop ' + (l+1), cx, cy + r + 16);
   }
 
-  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = COL_DIM; ctx.textAlign = 'center';
   ctx.fillText(loops + ' loop' + (loops !== 1 ? 's' : '') + ' · d^' + (loops-1) + ' factor', w/2, 16);
 }
 
@@ -813,7 +817,7 @@ function drawBraidDiagram() {
     ctx.arc(w/2, h/2, 40, 0, Math.PI * 2);
     ctx.stroke();
     ctx.font = '11px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#6b7394';
+    ctx.fillStyle = COL_DIM;
     ctx.textAlign = 'center';
     ctx.fillText('unknot (1 strand, no crossings)', w/2, h/2 + 60);
     return;
@@ -838,7 +842,7 @@ function drawBraidDiagram() {
   for (var i = 0; i < braid.n; i++) {
     var sx = baseX + i * strandGap;
     var arcR = 30 + i * 18;
-    ctx.strokeStyle = 'rgba(232,200,106,' + (0.2 + i * 0.1) + ')';
+    ctx.strokeStyle = hexToRgba(COL_BRAID, 0.2 + i * 0.1);
     ctx.beginPath();
     ctx.moveTo(sx, yTop);
     ctx.bezierCurveTo(sx + arcR, yTop, sx + arcR, yBot, sx, yBot);
@@ -847,7 +851,7 @@ function drawBraidDiagram() {
   ctx.setLineDash([]);
 
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b7394';
+  ctx.fillStyle = COL_DIM;
   ctx.textAlign = 'center';
   ctx.fillText('closure arcs', baseX + (braid.n - 1) * strandGap / 2 + 50, (yTop + yBot) / 2);
 }

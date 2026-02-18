@@ -10,8 +10,8 @@
   body { --accent: var(--accent-tl); }
   body::before {
     background:
-      radial-gradient(ellipse at 25% 20%, rgba(224,112,112,0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 75% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
+      radial-gradient(ellipse at 25% 20%, rgba(130,32,32,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 75% 80%, rgba(125,93,125,0.04) 0%, transparent 50%);
   }
 </style>
 </head>
@@ -394,6 +394,11 @@ function genLabelSigma(g) {
 }
 
 /* ============================================================
+ * DRAWING HELPERS
+ * ============================================================ */
+var COL_DIM=getCSSColor('--text-dim'), COL_TL=getCSSColor('--accent-tl');
+
+/* ============================================================
  * EXPLANATORY FIGURES
  * ============================================================ */
 function drawTLDiagrams() {
@@ -406,7 +411,7 @@ function drawTLDiagrams() {
 
   function drawDots(x, g) {
     for (var i = 0; i < 3; i++) {
-      ctx.fillStyle = '#6b7394';
+      ctx.fillStyle = COL_DIM;
       ctx.beginPath(); ctx.arc(x + i*g, yTop, 3, 0, Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(x + i*g, yBot, 3, 0, Math.PI*2); ctx.fill();
     }
@@ -417,39 +422,39 @@ function drawTLDiagrams() {
   /* Identity */
   var ix = 80;
   drawDots(ix, gap);
-  ctx.strokeStyle = '#6b7394';
+  ctx.strokeStyle = COL_DIM;
   for (var i = 0; i < 3; i++) {
     ctx.beginPath(); ctx.moveTo(ix+i*gap, yTop); ctx.lineTo(ix+i*gap, yBot); ctx.stroke();
   }
-  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = COL_DIM; ctx.textAlign = 'center';
   ctx.fillText('Identity I', ix+gap, h-15);
 
   /* U1 */
   var ux = 280;
   drawDots(ux, gap);
-  ctx.strokeStyle = '#e07070';
+  ctx.strokeStyle = COL_TL;
   /* Cap on top (1-2) */
   ctx.beginPath(); ctx.moveTo(ux, yTop); ctx.quadraticCurveTo(ux+gap/2, yTop+25, ux+gap, yTop); ctx.stroke();
   /* Cup on bottom (1-2) */
   ctx.beginPath(); ctx.moveTo(ux, yBot); ctx.quadraticCurveTo(ux+gap/2, yBot-25, ux+gap, yBot); ctx.stroke();
   /* Through-line 3 */
-  ctx.strokeStyle = '#6b7394';
+  ctx.strokeStyle = COL_DIM;
   ctx.beginPath(); ctx.moveTo(ux+2*gap, yTop); ctx.lineTo(ux+2*gap, yBot); ctx.stroke();
-  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#e07070'; ctx.textAlign = 'center';
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = COL_TL; ctx.textAlign = 'center';
   ctx.fillText('U₁', ux+gap, h-15);
 
   /* U2 */
   var vx = 490;
   drawDots(vx, gap);
   /* Through-line 1 */
-  ctx.strokeStyle = '#6b7394';
+  ctx.strokeStyle = COL_DIM;
   ctx.beginPath(); ctx.moveTo(vx, yTop); ctx.lineTo(vx, yBot); ctx.stroke();
   /* Cap on top (2-3) */
-  ctx.strokeStyle = '#e07070';
+  ctx.strokeStyle = COL_TL;
   ctx.beginPath(); ctx.moveTo(vx+gap, yTop); ctx.quadraticCurveTo(vx+1.5*gap, yTop+25, vx+2*gap, yTop); ctx.stroke();
   /* Cup on bottom (2-3) */
   ctx.beginPath(); ctx.moveTo(vx+gap, yBot); ctx.quadraticCurveTo(vx+1.5*gap, yBot-25, vx+2*gap, yBot); ctx.stroke();
-  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#e07070'; ctx.textAlign = 'center';
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = COL_TL; ctx.textAlign = 'center';
   ctx.fillText('U₂', vx+gap, h-15);
 }
 

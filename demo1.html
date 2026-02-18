@@ -103,7 +103,7 @@
 
     <div class="figure">
       <canvas id="figSmoothing" width="600" height="180"></canvas>
-      <div class="figure-caption">Left: the original crossing. Center: <span style="color:#5b9bd5">A-smoothing</span> (pairs 0–3 and 1–2). Right: <span style="color:#d4845a">B-smoothing</span> (pairs 0–1 and 2–3).</div>
+      <div class="figure-caption">Left: the original crossing. Center: <span class="color-a">A-smoothing</span> (pairs 0–3 and 1–2). Right: <span class="color-b">B-smoothing</span> (pairs 0–1 and 2–3).</div>
     </div>
 
     <p>Each smoothing choice eliminates one crossing. If we choose a smoothing for <em>every</em> crossing in the knot, we eliminate <em>all</em> the crossings, and the knot dissolves into a collection of simple, non-crossing <span class="key-term">loops</span> — plain circles sitting on the page with no crossings at all.</p>
@@ -353,13 +353,17 @@ function currentState(){var s=0;for(var i=0;i<smoothings.length;i++)if(smoothing
 /* ============================================================
  * DRAWING HELPERS
  * ============================================================ */
-var COL_A='#5b9bd5', COL_B='#d4845a';
+var COL_A=getCSSColor('--accent-a'), COL_B=getCSSColor('--accent-b');
+var COL_DIM=getCSSColor('--text-dim'), COL_POLY=getCSSColor('--accent-poly');
+var COL_LOOP=getCSSColor('--accent-loop'), COL_NEG=getCSSColor('--negative');
+var COL_HI=getCSSColor('--highlight'), COL_MGREEN=getCSSColor('--medium-green');
+var COL_MGOLD=getCSSColor('--medium-gold'), COL_BRAID=getCSSColor('--accent-braid');
 
 function drawCrossing(canvas,index,isB){
   var ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
   var cx=w/2,cy=h/2,r=Math.min(w,h)*0.35;
   ctx.clearRect(0,0,w,h);
-  ctx.fillStyle=isB?'rgba(212,132,90,0.06)':'rgba(91,155,213,0.06)';
+  ctx.fillStyle=isB?hexToRgba(COL_B,0.06):hexToRgba(COL_A,0.06);
   ctx.beginPath();ctx.arc(cx,cy,r+8,0,Math.PI*2);ctx.fill();
   ctx.lineWidth=2.5;ctx.lineCap='round';
   if(!isB){
@@ -371,11 +375,11 @@ function drawCrossing(canvas,index,isB){
     ctx.beginPath();ctx.moveTo(cx-r,cy+r*0.5);ctx.quadraticCurveTo(cx-r*0.3,cy,cx-r,cy-r*0.5);ctx.stroke();
     ctx.beginPath();ctx.moveTo(cx+r,cy-r*0.5);ctx.quadraticCurveTo(cx+r*0.3,cy,cx+r,cy+r*0.5);ctx.stroke();
   }
-  ctx.strokeStyle='rgba(107,115,148,0.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.strokeStyle=hexToRgba(COL_DIM,0.2);ctx.lineWidth=1;ctx.setLineDash([3,3]);
   ctx.beginPath();ctx.moveTo(cx-r,cy-r*0.5);ctx.lineTo(cx+r,cy+r*0.5);ctx.stroke();
   ctx.beginPath();ctx.moveTo(cx-r,cy+r*0.5);ctx.lineTo(cx+r,cy-r*0.5);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle='rgba(107,115,148,0.5)';ctx.textAlign='center';
+  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=hexToRgba(COL_DIM,0.5);ctx.textAlign='center';
   var knot=KNOTS[currentKnot],arcs=knot.crossings[index].arcs;
   ctx.fillText(arcs[0],cx-r-8,cy+r*0.5+3);
   ctx.fillText(arcs[1],cx-r-8,cy-r*0.5+3);
@@ -388,7 +392,7 @@ function drawLoops(knot,state){
   var w=canvas.width,h=canvas.height;
   ctx.clearRect(0,0,w,h);
   var info=countLoops(knot,state),loops=info.loops,la=info.loopAssign;
-  var colors=['#7bc77b','#5b9bd5','#d4845a','#c4a0e8','#f0d060','#e06070','#60c0c0','#d070d0'];
+  var colors=[COL_LOOP,COL_A,COL_B,COL_POLY,COL_HI,COL_NEG,COL_MGREEN,COL_MGOLD];
   var spacing=Math.min(80,(w-40)/loops);
   var startX=w/2-(loops-1)*spacing/2;
   for(var l=0;l<loops;l++){
@@ -402,10 +406,10 @@ function drawLoops(knot,state){
     for(var a=0;a<knot.numArcs;a++) if(la[a]===l) arcsInLoop.push(a);
     ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=col;ctx.textAlign='center';
     ctx.fillText('loop '+(l+1),cx,cy+r+16);
-    ctx.font='8px "JetBrains Mono",monospace';ctx.fillStyle='rgba(107,115,148,0.6)';
+    ctx.font='8px "JetBrains Mono",monospace';ctx.fillStyle=hexToRgba(COL_DIM,0.6);
     ctx.fillText('arcs: {'+arcsInLoop.join(',')+'}',cx,cy+r+28);
   }
-  ctx.font='11px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';ctx.textAlign='center';
+  ctx.font='11px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;ctx.textAlign='center';
   ctx.fillText(loops+' loop'+(loops!==1?'s':'')+' \u00b7 d^'+(loops-1)+' factor',w/2,18);
 }
 
@@ -420,14 +424,14 @@ function drawFigKnots(){
   ctx.lineWidth=2.5;ctx.lineCap='round';
 
   /* Unknot */
-  ctx.strokeStyle='#6b7394';
+  ctx.strokeStyle=COL_DIM;
   ctx.beginPath();ctx.arc(110,h/2,40,0,Math.PI*2);ctx.stroke();
-  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';ctx.textAlign='center';
+  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;ctx.textAlign='center';
   ctx.fillText('unknot',110,h/2+60);
 
   /* Trefoil (schematic) */
   var tx=340,ty=h/2;
-  ctx.strokeStyle='#5b9bd5';
+  ctx.strokeStyle=COL_A;
   ctx.beginPath();
   /* Draw a trefoil-like shape using bezier curves */
   var pts=[
@@ -442,27 +446,27 @@ function drawFigKnots(){
   ctx.quadraticCurveTo(pts[pts.length-1][0],pts[pts.length-1][1],pts[0][0],pts[0][1]);
   ctx.stroke();
   /* Crossing indicators */
-  ctx.fillStyle='rgba(91,155,213,0.3)';
+  ctx.fillStyle=hexToRgba(COL_A,0.3);
   ctx.beginPath();ctx.arc(tx+10,ty-10,4,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(tx-15,ty+12,4,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(tx+15,ty+15,4,0,Math.PI*2);ctx.fill();
-  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle='#5b9bd5';ctx.textAlign='center';
+  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle=COL_A;ctx.textAlign='center';
   ctx.fillText('trefoil',tx,ty+60);
-  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';
+  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;
   ctx.fillText('3 crossings',tx,ty+74);
 
   /* Hopf link */
   var hx=570,hy=h/2;
-  ctx.strokeStyle='#c4a0e8';
+  ctx.strokeStyle=COL_POLY;
   ctx.beginPath();ctx.ellipse(hx-18,hy,28,38,0,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='#d4845a';
+  ctx.strokeStyle=COL_B;
   ctx.beginPath();ctx.ellipse(hx+18,hy,28,38,0,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle='rgba(196,160,232,0.3)';
+  ctx.fillStyle=hexToRgba(COL_POLY,0.3);
   ctx.beginPath();ctx.arc(hx,hy-18,4,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(hx,hy+18,4,0,Math.PI*2);ctx.fill();
-  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle='#c4a0e8';ctx.textAlign='center';
+  ctx.font='12px "JetBrains Mono",monospace';ctx.fillStyle=COL_POLY;ctx.textAlign='center';
   ctx.fillText('Hopf link',hx,hy+60);
-  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';
+  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;
   ctx.fillText('2 crossings',hx,hy+74);
 }
 
@@ -474,39 +478,39 @@ function drawFigCrossing(){
   var cx=w/2,cy=h/2,r=55;
 
   /* Over-strand (continuous) */
-  ctx.strokeStyle='#5b9bd5';ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.strokeStyle=COL_A;ctx.lineWidth=3;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(cx-r,cy-r*0.6);ctx.lineTo(cx+r,cy+r*0.6);ctx.stroke();
 
   /* Under-strand (with gap) */
-  ctx.strokeStyle='#d4845a';ctx.lineWidth=3;
+  ctx.strokeStyle=COL_B;ctx.lineWidth=3;
   var gapSize=12;
   ctx.beginPath();ctx.moveTo(cx-r,cy+r*0.6);ctx.lineTo(cx-gapSize,cy+gapSize*0.02);ctx.stroke();
   ctx.beginPath();ctx.moveTo(cx+gapSize,cy-gapSize*0.02);ctx.lineTo(cx+r,cy-r*0.6);ctx.stroke();
 
   /* Labels */
   ctx.font='bold 14px "JetBrains Mono",monospace';ctx.textAlign='center';
-  ctx.fillStyle='#d4845a';
+  ctx.fillStyle=COL_B;
   ctx.fillText('a',cx-r-16,cy+r*0.6+5);
   ctx.fillText('c',cx+r+16,cy-r*0.6+5);
-  ctx.fillStyle='#5b9bd5';
+  ctx.fillStyle=COL_A;
   ctx.fillText('b',cx-r-16,cy-r*0.6+5);
   ctx.fillText('d',cx+r+16,cy+r*0.6+5);
 
   /* Position numbers */
-  ctx.font='10px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';
+  ctx.font='10px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;
   ctx.fillText('(0)',cx-r-16,cy+r*0.6+19);
   ctx.fillText('(1)',cx-r-16,cy-r*0.6+19);
   ctx.fillText('(2)',cx+r+16,cy-r*0.6+19);
   ctx.fillText('(3)',cx+r+16,cy+r*0.6+19);
 
   /* Center dot */
-  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.fillStyle=hexToRgba(COL_DIM,0.15);
   ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();
 
   /* Annotations */
-  ctx.font='11px "Crimson Pro",serif';ctx.fillStyle='#d4845a';
+  ctx.font='11px "Crimson Pro",serif';ctx.fillStyle=COL_B;
   ctx.textAlign='left';ctx.fillText('under-strand',cx+r+30,cy-10);
-  ctx.fillStyle='#5b9bd5';
+  ctx.fillStyle=COL_A;
   ctx.fillText('over-strand',cx+r+30,cy+10);
 }
 
@@ -519,16 +523,16 @@ function drawFigSmoothing(){
 
   /* Original crossing */
   var ox=100;
-  ctx.strokeStyle='#5b9bd5';ctx.lineWidth=2.5;ctx.lineCap='round';
+  ctx.strokeStyle=COL_A;ctx.lineWidth=2.5;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(ox-r,sy-r*0.6);ctx.lineTo(ox+r,sy+r*0.6);ctx.stroke();
-  ctx.strokeStyle='#d4845a';ctx.lineWidth=2.5;
+  ctx.strokeStyle=COL_B;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(ox-r,sy+r*0.6);ctx.lineTo(ox-8,sy+2);ctx.stroke();
   ctx.beginPath();ctx.moveTo(ox+8,sy-2);ctx.lineTo(ox+r,sy-r*0.6);ctx.stroke();
-  ctx.font='10px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';ctx.textAlign='center';
+  ctx.font='10px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;ctx.textAlign='center';
   ctx.fillText('original',ox,sy+r+20);
 
   /* Arrow */
-  ctx.strokeStyle='#6b7394';ctx.lineWidth=1;
+  ctx.strokeStyle=COL_DIM;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(170,sy);ctx.lineTo(190,sy);ctx.stroke();
   ctx.beginPath();ctx.moveTo(187,sy-3);ctx.lineTo(190,sy);ctx.lineTo(187,sy+3);ctx.stroke();
 
@@ -539,11 +543,11 @@ function drawFigSmoothing(){
   ctx.beginPath();ctx.moveTo(ax-r,sy-r*0.5);ctx.quadraticCurveTo(ax,sy+r*0.3,ax+r,sy+r*0.5);ctx.stroke();
   ctx.font='11px "JetBrains Mono",monospace';ctx.fillStyle=COL_A;ctx.textAlign='center';
   ctx.fillText('A-smoothing',ax,sy+r+20);
-  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';
+  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;
   ctx.fillText('pairs: (0,3) (1,2)',ax,sy+r+34);
 
   /* Arrow */
-  ctx.strokeStyle='#6b7394';ctx.lineWidth=1;
+  ctx.strokeStyle=COL_DIM;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(350,sy);ctx.lineTo(370,sy);ctx.stroke();
   ctx.beginPath();ctx.moveTo(367,sy-3);ctx.lineTo(370,sy);ctx.lineTo(367,sy+3);ctx.stroke();
 
@@ -555,7 +559,7 @@ function drawFigSmoothing(){
   ctx.beginPath();ctx.moveTo(bx+r,sy-r*0.5);ctx.quadraticCurveTo(bx+r*0.3,sy,bx+r,sy+r*0.5);ctx.stroke();
   ctx.font='11px "JetBrains Mono",monospace';ctx.fillStyle=COL_B;ctx.textAlign='center';
   ctx.fillText('B-smoothing',bx,sy+r+20);
-  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle='#6b7394';
+  ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=COL_DIM;
   ctx.fillText('pairs: (0,1) (2,3)',bx,sy+r+34);
 }
 
