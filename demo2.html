@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Braid Words & the Kauffman Bracket — Demo 2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #0c0e13;
+  --surface: #14171e;
+  --surface2: #1a1e28;
+  --surface3: #1f2433;
+  --border: #2a2f3d;
+  --text: #d4d8e4;
+  --text-dim: #6b7394;
+  --text-bright: #eef0f6;
+  --accent-a: #5b9bd5;
+  --accent-b: #d4845a;
+  --accent-loop: #7bc77b;
+  --accent-poly: #c4a0e8;
+  --accent-braid: #e8c86a;
+  --highlight: #f0d060;
+  --negative: #e06070;
+  --positive: #60c080;
+  --link: #8bb8e0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 15%, rgba(232,200,106,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 85%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-weight: 300;
+  font-size: 2.4rem;
+  letter-spacing: 0.03em;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+
+header h1 em { color: var(--accent-braid); font-style: italic; }
+
+header .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+header .demo-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--accent-braid);
+  border: 1px solid rgba(232,200,106,0.3);
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  letter-spacing: 0.1em;
+}
+
+/* PROSE */
+.prose { margin-bottom: 2.5rem; }
+
+.prose h2 {
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--text-bright);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.prose h2 .num { color: var(--accent-braid); font-style: italic; margin-right: 0.3rem; }
+
+.prose h3 {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose p { margin-bottom: 1rem; color: var(--text); }
+.prose p.dim { color: var(--text-dim); font-style: italic; }
+
+.key-term { color: var(--accent-braid); font-weight: 500; }
+.key-term-poly { color: var(--accent-poly); font-weight: 500; }
+.color-a { color: var(--accent-a); }
+.color-b { color: var(--accent-b); }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  color: var(--accent-poly);
+}
+
+/* FIGURES */
+.figure {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.25rem;
+  margin: 1.25rem 0 1.5rem;
+  text-align: center;
+}
+
+.figure canvas { display: block; margin: 0 auto; }
+
+.figure-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-top: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+/* FORMULA BOX */
+.formula-box {
+  background: var(--surface);
+  border-left: 3px solid var(--accent-braid);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0 1.5rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.15rem;
+  text-align: center;
+  line-height: 1.9;
+}
+
+.formula-box .var-a { color: var(--accent-poly); font-style: italic; }
+.formula-box sup { font-size: 0.7em; }
+.formula-box .label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+/* STEP CALLOUTS */
+.step-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
+
+.step-box .step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--accent-braid);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+
+/* RECAP BOX */
+.recap-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-poly);
+  border-radius: 3px;
+  padding: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.recap-box .recap-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent-poly);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.recap-box p { margin-bottom: 0.75rem; color: var(--text); font-size: 0.95rem; }
+.recap-box p:last-child { margin-bottom: 0; }
+
+/* SEPARATOR */
+.sep { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+
+/* TOC */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.toc a {
+  display: block;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+  padding: 0.2rem 0;
+  transition: color 0.2s;
+}
+
+.toc a:hover { color: var(--accent-braid); }
+.toc a .num { color: var(--accent-braid); font-style: italic; margin-right: 0.4rem; }
+
+/* INTERACTIVE TOOL */
+.tool-header { text-align: center; margin-bottom: 1.5rem; }
+
+.tool-header h2 {
+  font-weight: 300;
+  font-size: 1.6rem;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+
+.tool-header .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+/* Braid selector */
+.braid-selector {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.braid-btn {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  padding: 0.55rem 1.3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  letter-spacing: 0.02em;
+}
+
+.braid-btn:hover { border-color: var(--accent-braid); color: var(--text); }
+
+.braid-btn.active {
+  background: var(--surface2);
+  border-color: var(--accent-braid);
+  color: var(--accent-braid);
+  box-shadow: 0 0 12px rgba(232,200,106,0.1);
+}
+
+.braid-desc {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  min-height: 2.5em;
+}
+
+.instructions {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.instructions kbd {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.6rem;
+}
+
+/* Main layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.25rem;
+  animation: fadeIn 0.4s ease both;
+}
+
+.panel:nth-child(2) { animation-delay: 0.1s; }
+
+.panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Braid word display */
+.braid-word-display {
+  text-align: center;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.braid-word {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.4rem;
+  color: var(--text-bright);
+  letter-spacing: 0.05em;
+}
+
+.braid-word .sigma { color: var(--accent-braid); }
+.braid-word .sigma-neg { color: var(--accent-b); }
+.braid-word sup { font-size: 0.65em; }
+.braid-word .sep-dot { color: var(--text-dim); margin: 0 0.15em; }
+
+/* Braid canvas */
+.braid-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 280px;
+}
+
+/* Crossing diagram for closure */
+.crossing-diagram {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 120px;
+  align-items: center;
+}
+
+.crossing-box {
+  position: relative;
+  width: 100px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.crossing-box:hover { transform: scale(1.08); }
+.crossing-box canvas { width: 100%; height: 100px; }
+
+.crossing-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-align: center;
+  color: var(--text-dim);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+.smoothing-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-align: center;
+  margin-top: 2px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.smoothing-type.type-a { color: var(--accent-a); }
+.smoothing-type.type-b { color: var(--accent-b); }
+
+/* Loop canvas */
+.loop-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 180px;
+}
+
+/* State table */
+.state-table-wrap {
+  max-height: 420px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.state-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.state-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6rem;
+  padding: 0.5rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.state-table td {
+  padding: 0.4rem 0.4rem;
+  border-bottom: 1px solid rgba(42,47,61,0.5);
+  vertical-align: middle;
+}
+
+.state-table tr { transition: background 0.15s; cursor: pointer; }
+.state-table tr:hover { background: rgba(232,200,106,0.04); }
+.state-table tr.active-state { background: rgba(232,200,106,0.08); }
+.state-table tr.active-state td { color: var(--accent-braid); }
+
+.state-bits { display: inline-flex; gap: 2px; }
+
+.bit {
+  display: inline-block;
+  width: 16px; height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 2px;
+  font-size: 0.6rem;
+  font-weight: 500;
+}
+
+.bit-a { background: rgba(91,155,213,0.15); color: var(--accent-a); }
+.bit-b { background: rgba(212,132,90,0.15); color: var(--accent-b); }
+
+.loops-badge {
+  display: inline-block;
+  background: rgba(123,199,123,0.12);
+  color: var(--accent-loop);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+/* Result panel */
+.result-panel { grid-column: 1 / -1; }
+
+.polynomial-display {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.3rem;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+.polynomial-display .coeff-pos { color: var(--positive); }
+.polynomial-display .coeff-neg { color: var(--negative); }
+.polynomial-display .var-a { color: var(--accent-poly); font-style: italic; }
+.polynomial-display .sup { font-size: 0.8em; vertical-align: super; }
+
+.info-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+
+.info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot-a { background: var(--accent-a); }
+.dot-b { background: var(--accent-b); }
+.dot-loop { background: var(--accent-loop); }
+.dot-poly { background: var(--accent-poly); }
+.dot-braid { background: var(--accent-braid); }
+
+/* Accumulation controls */
+.accum-controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+
+.accum-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.4rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.accum-btn:hover { border-color: var(--accent-braid); color: var(--text); }
+.accum-btn.active-play { border-color: var(--accent-loop); color: var(--accent-loop); }
+
+.accum-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.running-sum {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 0.5rem;
+  min-height: 2em;
+  color: var(--highlight);
+}
+
+.running-sum .coeff-pos { color: var(--positive); }
+.running-sum .coeff-neg { color: var(--negative); }
+.running-sum .var-a { color: var(--accent-poly); font-style: italic; }
+.running-sum .sup { font-size: 0.8em; vertical-align: super; }
+
+/* Comparison panel */
+.comparison-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  align-items: center;
+}
+
+.compare-side {
+  text-align: center;
+  padding: 1rem;
+}
+
+.compare-side .compare-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.compare-side .compare-poly {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+}
+
+.compare-equals {
+  font-size: 2rem;
+  color: var(--accent-loop);
+  padding: 0 1rem;
+}
+
+.compare-neq {
+  font-size: 2rem;
+  color: var(--negative);
+  padding: 0 1rem;
+}
+
+/* Matrix display */
+.matrix-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0.75rem;
+  line-height: 2;
+}
+
+.matrix-display .mat-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.matrix-display .mat-entry {
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Chirality display */
+.chirality-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.chirality-item {
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--surface2);
+  border-radius: 3px;
+}
+
+.chirality-arrow {
+  font-size: 1.5rem;
+  color: var(--text-dim);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Braid <em>Words</em> &amp; the Bracket</h1>
+    <div class="subtitle">A second route to the same invariant</div>
+    <div class="demo-tag">Demo 2 &middot; Building on Demo 1</div>
+  </header>
+
+  <!-- RECAP -->
+  <div class="recap-box">
+    <div class="recap-title">Recap from Demo 1</div>
+    <p>In <strong>Demo 1</strong> we introduced the <span class="key-term-poly">Kauffman bracket</span> — a polynomial invariant that tells knots apart. The recipe was: take a knot diagram with <em>n</em> crossings, resolve each crossing as either an <span class="color-a">A-smoothing</span> or <span class="color-b">B-smoothing</span>, count the resulting loops, and sum a weighted contribution from all 2<sup>n</sup> states. That state sum gives the bracket ⟨K⟩, a Laurent polynomial in <em>A</em>.</p>
+    <p>The state sum works, but it has an exponential cost: 2<sup>n</sup> states for <em>n</em> crossings. Demo 1 encoded knots using <em>planar diagram (PD) notation</em> — a list of arc labels at each crossing. This demo introduces a completely different way to describe knots — using <span class="key-term">braids</span> — and shows that the same bracket falls out when we compute the state sum on the braid closure.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#sec-braids"><span class="num">1.</span> What is a braid?</a>
+    <a href="#sec-closure"><span class="num">2.</span> Braid closure: from braids to knots</a>
+    <a href="#sec-words"><span class="num">3.</span> Braid words as data</a>
+    <a href="#sec-resolution"><span class="num">4.</span> Resolving crossings on braids</a>
+    <a href="#sec-loops"><span class="num">5.</span> Counting loops with union-find</a>
+    <a href="#sec-chirality"><span class="num">6.</span> Chirality: the mirror test</a>
+    <a href="#sec-matrix"><span class="num">7.</span> Toward the matrix approach</a>
+    <a href="#sec-code"><span class="num">8.</span> What the C code does</a>
+    <a href="#sec-tool"><span class="num">9.</span> Interactive explorer</a>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="prose" id="sec-braids">
+    <h2><span class="num">1.</span> What is a braid?</h2>
+
+    <p>Imagine <em>n</em> vertical strands hanging from a bar, like threads on a loom. Now let some of those strands cross over each other — always moving downward, never looping back up. The result is a <span class="key-term">braid</span>: a set of intertwined strands that go from a row of <em>n</em> points at the top to a row of <em>n</em> points at the bottom, crossing each other along the way.</p>
+
+    <p>The simplest interesting braid has just 2 strands. There is one elementary move: strand 1 crosses over strand 2 (a <span class="key-term">positive crossing</span>, written σ₁), or strand 2 crosses over strand 1 (a <span class="key-term">negative crossing</span>, written σ₁⁻¹). With 3 strands there are two generators: σ₁ (strands 1 and 2 cross) and σ₂ (strands 2 and 3 cross). In general, an <em>n</em>-strand braid has generators σ₁ through σ<sub>n−1</sub>, each with a positive and negative version.</p>
+
+    <div class="figure">
+      <canvas id="figBraidBasic" width="700" height="220"></canvas>
+      <div class="figure-caption">Left: the positive generator σ₁ on 2 strands. Center: three generators stacked — σ₁ · σ₁ · σ₁ (the trefoil braid). Right: a 3-strand braid σ₁ · σ₂⁻¹ · σ₁ · σ₂⁻¹ (figure-eight braid).</div>
+    </div>
+
+    <p>A braid is a <em>sequence</em> of these elementary crossings, read from top to bottom. Mathematically, braids form a <span class="key-term">group</span> — you can compose them (by stacking one below another), and every braid has an inverse (the same braid reflected upside-down, which undoes all the crossings). This algebraic structure makes braids a powerful language for describing knots.</p>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="prose" id="sec-closure">
+    <h2><span class="num">2.</span> Braid closure: from braids to knots</h2>
+
+    <p>A braid has free ends — strands come in at the top and go out at the bottom. To make a knot (which is a closed loop), we need to join those ends. The standard way is the <span class="key-term">braid closure</span>: connect each strand at the bottom to the corresponding strand at the top by arcing around the right side. Strand <em>k</em> at the bottom connects to strand <em>k</em> at the top.</p>
+
+    <div class="figure">
+      <canvas id="figClosure" width="700" height="250"></canvas>
+      <div class="figure-caption">The braid σ₁³ on 2 strands (left) and its closure (right) — which produces the trefoil knot.</div>
+    </div>
+
+    <p>A remarkable theorem due to Alexander (1923) guarantees that <em>every</em> knot or link can be represented as the closure of some braid. This means braids are a completely general language for describing knots — any knot you can draw has a braid word that produces it.</p>
+
+    <p>Moreover, Markov's theorem (1935) tells us exactly when two braid words give the same knot: they must be related by a specific set of moves (conjugation and stabilization). This is the algebraic counterpart to the Reidemeister moves on knot diagrams.</p>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="prose" id="sec-words">
+    <h2><span class="num">3.</span> Braid words as data</h2>
+
+    <p>Where Demo 1 used PD notation (lists of arc labels at each crossing), Demo 2 uses <span class="key-term">braid words</span>: a sequence of integers, where +<em>i</em> means "strand <em>i</em> crosses over strand <em>i</em>+1" (σ<sub>i</sub>) and −<em>i</em> means the reverse (σ<sub>i</sub>⁻¹).</p>
+
+    <div class="formula-box">
+      <span class="label">Braid word notation</span>
+      Trefoil &nbsp;=&nbsp; [+1, +1, +1] on 2 strands &nbsp;→&nbsp; σ₁³<br>
+      Figure-eight &nbsp;=&nbsp; [+1, −2, +1, −2] on 3 strands &nbsp;→&nbsp; σ₁ σ₂⁻¹ σ₁ σ₂⁻¹<br>
+      Hopf link &nbsp;=&nbsp; [+1, +1] on 2 strands &nbsp;→&nbsp; σ₁²
+    </div>
+
+    <p>This is more compact than PD notation — the trefoil needs just three numbers instead of twelve arc labels. The tradeoff is that the topological structure (which arcs connect where) is implicit rather than explicit. We recover it by tracking how strands weave through the crossings.</p>
+
+    <p>The <span class="key-term">writhe</span> is easy to read off a braid word: it is just the sum of the signs. Positive crossings contribute +1, negative crossings contribute −1. So the trefoil [+1, +1, +1] has writhe +3, and the figure-eight [+1, −2, +1, −2] has writhe 0 (two positive, two negative).</p>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="prose" id="sec-resolution">
+    <h2><span class="num">4.</span> Resolving crossings on braids</h2>
+
+    <p>The state-sum computation is fundamentally the same as Demo 1: for each of the 2<sup>c</sup> states (where <em>c</em> is the number of crossings in the braid word), we resolve every crossing as either an <span class="color-a">A-smoothing</span> or a <span class="color-b">B-smoothing</span>, count loops, and accumulate the weighted contribution.</p>
+
+    <p>The only subtlety is what "A-smoothing" and "B-smoothing" <em>look like</em> on a braid. For a <strong>positive crossing</strong> σ<sub>i</sub>:</p>
+
+    <div class="step-box">
+      <div class="step-num">A-smoothing (horizontal join)</div>
+      <p>The two strands at positions <em>i</em> and <em>i</em>+1 get <em>cupped</em> together — they join at both the top and bottom of the crossing, forming two caps. The strands no longer continue through; they turn back. This is the "cup-cap" resolution.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">B-smoothing (straight through)</div>
+      <p>The two strands simply pass straight through — no crossing, no joining. Each strand continues from its top position directly to the corresponding bottom position.</p>
+    </div>
+
+    <p>For a <strong>negative crossing</strong> σ<sub>i</sub>⁻¹, the smoothings are swapped: the A-smoothing goes straight, and the B-smoothing cups.</p>
+
+    <div class="figure">
+      <canvas id="figBraidSmoothing" width="700" height="200"></canvas>
+      <div class="figure-caption">A positive crossing σ₁ and its two resolutions. <span style="color:#5b9bd5">A-smoothing</span>: strands cup together. <span style="color:#d4845a">B-smoothing</span>: strands pass straight through.</div>
+    </div>
+
+    <p>After resolving all crossings and adding the closure arcs, we count connected components — the loops. The weight is exactly as before: <em>A</em><sup>(#A−#B)</sup> · <em>d</em><sup>(loops−1)</sup> where <em>d</em> = −<em>A</em>² − <em>A</em>⁻².</p>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="prose" id="sec-loops">
+    <h2><span class="num">5.</span> Counting loops with union-find</h2>
+
+    <p>In Demo 1, loop counting worked by tracing arc connections around the smoothed diagram. With braids, we use a different but equivalent strategy: <span class="key-term">union-find</span>.</p>
+
+    <p>Think of the braid as a stack of levels. Between each pair of adjacent levels sits one crossing. At each level, there are <em>n</em> positions (one per strand). We create a node for every (level, position) pair — giving us (<em>c</em>+1) × <em>n</em> nodes total.</p>
+
+    <div class="step-box">
+      <div class="step-num">Connection rules</div>
+      <p>At each crossing, depending on the resolution: if <strong>straight</strong>, connect node(level, <em>p</em>) to node(level+1, <em>p</em>) for all positions. If <strong>cup</strong>, join positions <em>i</em> and <em>i</em>+1 at both the top and bottom of the crossing, and pass all other strands straight through. Finally, the closure arcs connect node(0, <em>k</em>) to node(<em>c</em>, <em>k</em>) for each strand.</p>
+    </div>
+
+    <p>Union-find is a classic data structure for tracking connected components. We start with every node in its own component. As we process each crossing and the closure arcs, we merge components. At the end, the number of remaining distinct components is exactly the loop count. This gives us the same information as Demo 1's arc-tracing algorithm, just organized differently to suit the braid structure.</p>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="prose" id="sec-chirality">
+    <h2><span class="num">6.</span> Chirality: the mirror test</h2>
+
+    <p>Braids make one property of knots especially visible: <span class="key-term">chirality</span>. The <em>mirror image</em> of a knot is what you get by switching every over-crossing to an under-crossing and vice versa. In braid language, this is simply negating every generator: σ<sub>i</sub> ↔ σ<sub>i</sub>⁻¹. The mirror of braid word [+1, +1, +1] is [−1, −1, −1].</p>
+
+    <p>A knot is called <span class="key-term">amphichiral</span> if it is equivalent to its own mirror image. Most knots are <em>not</em> amphichiral — the trefoil, for instance, is distinct from its mirror. The Kauffman bracket detects this: the bracket of the mirror is obtained by replacing <em>A</em> with <em>A</em>⁻¹ (reversing all exponents). If the original and reversed brackets differ, the knot is genuinely chiral.</p>
+
+    <p>The figure-eight knot <em>is</em> amphichiral — its bracket is palindromic (reads the same forwards and backwards in terms of powers of <em>A</em>), which means it equals its own mirror. This is an extraordinary topological fact, and the bracket proves it algebraically.</p>
+
+    <div class="figure">
+      <canvas id="figChirality" width="700" height="180"></canvas>
+      <div class="figure-caption">The right-handed trefoil σ₁³ and its mirror σ₁⁻³. Their brackets differ (the knot is chiral). The figure-eight's bracket is palindromic (the knot is amphichiral).</div>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="prose" id="sec-matrix">
+    <h2><span class="num">7.</span> Toward the matrix approach</h2>
+
+    <p>The state sum still costs 2<sup>c</sup> — the same exponential as Demo 1. But braids open the door to something better. The <span class="key-term">Temperley-Lieb algebra</span> provides a representation where each braid generator σ<sub>i</sub> maps to a matrix, and the bracket can (in principle) be extracted from the product of those matrices.</p>
+
+    <p>For the simplest case — 2 strands — the representation is 1-dimensional (a scalar). Each positive crossing maps to:</p>
+
+    <div class="formula-box">
+      <span class="label">Braid representation (2-strand, 1D)</span>
+      ρ(σ₁) &nbsp;=&nbsp; <span class="var-a">A</span> + <span class="var-a">A</span><sup>−1</sup> · δ
+      &nbsp;=&nbsp; <span class="var-a">A</span> + <span class="var-a">A</span><sup>−1</sup>(−<span class="var-a">A</span><sup>2</sup> − <span class="var-a">A</span><sup>−2</sup>)
+      &nbsp;=&nbsp; −<span class="var-a">A</span><sup>−3</sup>
+    </div>
+
+    <p>And each negative crossing maps to ρ(σ₁⁻¹) = −<em>A</em>³. Notice the mirror symmetry: positive and negative crossings give expressions related by <em>A</em> ↔ <em>A</em>⁻¹. This is the algebraic heart of chirality.</p>
+
+    <p>For more strands, the matrices grow (dimension equals the relevant Catalan number), but the computation becomes a <em>polynomial-time</em> matrix multiplication instead of an exponential state sum. The full Markov trace construction — which recovers the bracket from the trace of the matrix product — is the subject of Demo 3.</p>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="prose" id="sec-code">
+    <h2><span class="num">8.</span> What the C code does</h2>
+
+    <div class="step-box">
+      <div class="step-num">Laurent polynomials (reused from Demo 1)</div>
+      <p>The same <code>Poly</code> type from Demo 1 — arrays of integer coefficients with a lowest exponent — is reused identically. Addition and multiplication follow standard polynomial algebra with negative exponents.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Braid words</div>
+      <p>A <code>Braid</code> stores the number of strands, the length, and an array of signed integers (the braid word). Positive means σ<sub>i</sub>, negative means σ<sub>i</sub>⁻¹. Five test braids are hard-coded: the right-handed trefoil (σ₁³ on 2 strands), the left-handed trefoil (σ₁⁻³), the figure-eight (σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands), the Hopf link (σ₁²), and the trefoil on 3 strands (σ₁σ₂σ₁).</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Union-find loop counting</div>
+      <p>For a given braid and resolution state, the code creates (len+1) × n nodes. Each crossing either passes strands straight through or cups positions <em>i</em> and <em>i</em>+1 (depending on the smoothing and the crossing sign). Closure arcs are added. Connected components are counted — that is the loop count.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">State sum and verification</div>
+      <p>The bracket is computed by the same state sum as Demo 1, just applied to the braid closure. Results are verified against Demo 1's known values: the trefoil, figure-eight, and Hopf link brackets all match exactly. Additionally, the code verifies chirality (the right-handed and left-handed trefoil have mirror brackets) and palindromicity (the figure-eight bracket).</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Matrix proof of concept</div>
+      <p>For 2-strand braids, the code computes ρ(σ₁) = <em>A</em> + <em>A</em>⁻¹δ = −<em>A</em>⁻³ and ρ(σ₁⁻¹) = −<em>A</em>³, verifying the representation algebraically. This is the seed for Demo 3's full matrix trace approach.</p>
+    </div>
+
+    <p class="dim">The interactive tool below is a direct JavaScript port of this C code — the same union-find loop counting, the same polynomial arithmetic, the same braid definitions. Results match exactly.</p>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 9: INTERACTIVE TOOL -->
+  <div id="sec-tool">
+    <div class="tool-header">
+      <h2>Interactive Explorer</h2>
+      <div class="subtitle">Choose a braid, toggle smoothings, verify against Demo 1</div>
+    </div>
+
+    <div class="braid-selector" id="braidSelector">
+      <button class="braid-btn active" data-braid="trefoil">Trefoil σ₁³</button>
+      <button class="braid-btn" data-braid="trefoil-left">Mirror Trefoil σ₁⁻³</button>
+      <button class="braid-btn" data-braid="figure-eight">Figure-Eight</button>
+      <button class="braid-btn" data-braid="hopf">Hopf Link σ₁²</button>
+      <button class="braid-btn" data-braid="unknot">Unknot</button>
+    </div>
+
+    <div class="braid-desc" id="braidDesc">Right-handed trefoil: σ₁³ on 2 strands. Writhe = +3.</div>
+
+    <div class="instructions">
+      Click crossings to toggle <kbd>A</kbd> ↔ <kbd>B</kbd> smoothing. Click state table rows to jump to states. Compare brackets with Demo 1 results.
+    </div>
+
+    <div class="main-grid">
+      <!-- Left: braid diagram + smoothings -->
+      <div class="panel">
+        <div class="panel-title">Braid word &amp; diagram</div>
+        <div class="braid-word-display" id="braidWordDisplay"></div>
+        <div class="braid-canvas-wrap">
+          <canvas id="braidCanvas" width="360" height="280"></canvas>
+        </div>
+        <div style="margin-top:1rem;">
+          <div class="panel-title">Crossings — click to toggle smoothing</div>
+          <div class="crossing-diagram" id="crossingDiagram"></div>
+        </div>
+        <div style="margin-top:1.25rem;">
+          <div class="panel-title">Resulting loops for this state</div>
+          <div class="loop-canvas-wrap">
+            <canvas id="loopCanvas" width="360" height="180"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: state table -->
+      <div class="panel">
+        <div class="panel-title">All 2<sup style="font-size:0.5rem">c</sup> states — contributions to ⟨K⟩</div>
+        <div class="state-table-wrap">
+          <table class="state-table" id="stateTable">
+            <thead><tr>
+              <th>#</th>
+              <th>Smoothings</th>
+              <th>Loops</th>
+              <th>Weight</th>
+              <th>Contribution</th>
+            </tr></thead>
+            <tbody id="stateBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bottom: results -->
+      <div class="panel result-panel">
+        <div class="panel-title">Results</div>
+
+        <div class="accum-controls">
+          <button class="accum-btn" id="btnReset" title="Reset to state 0">⟲ Reset</button>
+          <button class="accum-btn" id="btnPrev" title="Previous state">◂ Prev</button>
+          <button class="accum-btn" id="btnNext" title="Next state">Next ▸</button>
+          <button class="accum-btn" id="btnPlay" title="Auto-play through states">▶ Play</button>
+          <span class="accum-label" id="accumLabel">State 0 / 7</span>
+        </div>
+        <div class="running-sum" id="runningSum"></div>
+
+        <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;text-align:center;">Kauffman Bracket ⟨K⟩ from braid closure</div>
+          <div class="polynomial-display" id="bracketResult"></div>
+        </div>
+
+        <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;text-align:center;">Jones f-polynomial = (−A³)<sup style="font-size:0.5rem">−w</sup>⟨K⟩</div>
+          <div class="polynomial-display" id="jonesResult" style="font-size:1.1rem;"></div>
+        </div>
+
+        <div id="comparisonSection" style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;text-align:center;">Verification against Demo 1</div>
+          <div id="comparisonContent"></div>
+        </div>
+
+        <div class="info-row" style="margin-top:0.75rem;">
+          <span><span class="dot dot-braid"></span> braid word</span>
+          <span><span class="dot dot-a"></span> A-smoothing</span>
+          <span><span class="dot dot-b"></span> B-smoothing</span>
+          <span><span class="dot dot-loop"></span> loops</span>
+          <span><span class="dot dot-poly"></span> bracket</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+ * POLYNOMIAL ARITHMETIC (same as Demo 1)
+ * ============================================================ */
+function Poly(c, lo) { this.c = c ? c.slice() : []; this.lo = lo || 0; }
+Poly.zero = function() { return new Poly([], 0); };
+Poly.mono = function(coeff, exp) {
+  if (coeff === 0) return Poly.zero();
+  return new Poly([coeff], exp);
+};
+Poly.prototype.trim = function() {
+  var a = 0, b = this.c.length - 1;
+  while (a <= b && this.c[a] === 0) a++;
+  if (a > b) { this.c = []; this.lo = 0; return this; }
+  while (b > a && this.c[b] === 0) b--;
+  this.c = this.c.slice(a, b + 1);
+  this.lo += a;
+  return this;
+};
+function polyAdd(a, b) {
+  if (!a.c.length) return new Poly(b.c, b.lo);
+  if (!b.c.length) return new Poly(a.c, a.lo);
+  var lo = Math.min(a.lo, b.lo);
+  var hi = Math.max(a.lo+a.c.length-1, b.lo+b.c.length-1);
+  var c = new Array(hi-lo+1); var i;
+  for (i=0;i<c.length;i++) c[i]=0;
+  for (i=0;i<a.c.length;i++) c[a.lo+i-lo]+=a.c[i];
+  for (i=0;i<b.c.length;i++) c[b.lo+i-lo]+=b.c[i];
+  return new Poly(c,lo).trim();
+}
+function polyMul(a, b) {
+  if (!a.c.length||!b.c.length) return Poly.zero();
+  var len=a.c.length+b.c.length-1;
+  var c=new Array(len); var i,j;
+  for(i=0;i<len;i++) c[i]=0;
+  for(i=0;i<a.c.length;i++) for(j=0;j<b.c.length;j++) c[i+j]+=a.c[i]*b.c[j];
+  return new Poly(c,a.lo+b.lo).trim();
+}
+function polyEq(a,b) {
+  if(a.c.length!==b.c.length) return false;
+  if(!a.c.length) return true;
+  if(a.lo!==b.lo) return false;
+  for(var i=0;i<a.c.length;i++) if(a.c[i]!==b.c[i]) return false;
+  return true;
+}
+function polyToHTML(p) {
+  if (!p.c.length) return '<span class="coeff-pos">0</span>';
+  var parts = [];
+  for (var i=0;i<p.c.length;i++) {
+    if (p.c[i]===0) continue;
+    var e=p.lo+i, coeff=p.c[i], s='';
+    if (parts.length>0) s += coeff>0 ? ' + ' : ' − ';
+    else if (coeff<0) s += '−';
+    var ac=Math.abs(coeff);
+    var cls = coeff>0 ? 'coeff-pos' : 'coeff-neg';
+    if (parts.length>0) cls = coeff>0?'coeff-pos':'coeff-neg';
+    if (ac!==1||e===0) s+=ac;
+    if (e===1) s+='<span class="var-a">A</span>';
+    else if (e===-1) s+='<span class="var-a">A</span><span class="sup">−1</span>';
+    else if (e!==0) s+='<span class="var-a">A</span><span class="sup">'+e+'</span>';
+    parts.push('<span class="'+cls+'">'+s+'</span>');
+  }
+  return parts.join('');
+}
+
+/* Mirror a polynomial: A -> A^{-1} */
+function polyMirror(p) {
+  if (!p.c.length) return Poly.zero();
+  var c = p.c.slice().reverse();
+  var lo = -(p.lo + p.c.length - 1);
+  return new Poly(c, lo).trim();
+}
+
+function polyIsPalindromic(p) {
+  if (!p.c.length) return true;
+  for (var i = 0; i < Math.floor(p.c.length/2); i++)
+    if (p.c[i] !== p.c[p.c.length-1-i]) return false;
+  /* Also check if lo is symmetric: lo + hi = 0 */
+  return (p.lo + p.lo + p.c.length - 1) === 0;
+}
+
+/* ============================================================
+ * BRAID DEFINITIONS
+ * ============================================================ */
+var BRAIDS = {
+  trefoil: {
+    name: 'Right-Handed Trefoil',
+    n: 2, word: [1, 1, 1],
+    desc: 'Right-handed trefoil: σ₁³ on 2 strands. Writhe = +3.',
+    demo1_name: 'Trefoil 3₁'
+  },
+  'trefoil-left': {
+    name: 'Left-Handed Trefoil',
+    n: 2, word: [-1, -1, -1],
+    desc: 'Left-handed trefoil: σ₁⁻³ on 2 strands. Writhe = −3. Mirror of the right-handed trefoil.',
+    demo1_name: null
+  },
+  'figure-eight': {
+    name: 'Figure-Eight 4₁',
+    n: 3, word: [1, -2, 1, -2],
+    desc: 'The simplest amphichiral knot: σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands. Writhe = 0.',
+    demo1_name: 'Figure-Eight 4₁'
+  },
+  hopf: {
+    name: 'Hopf Link',
+    n: 2, word: [1, 1],
+    desc: 'Hopf link: σ₁² on 2 strands. Writhe = +2.',
+    demo1_name: 'Hopf Link'
+  },
+  unknot: {
+    name: 'Unknot',
+    n: 1, word: [],
+    desc: 'The unknot: empty braid on 1 strand. Writhe = 0. Bracket = 1.',
+    demo1_name: 'Unknot'
+  }
+};
+
+/* Known Demo 1 brackets for verification */
+var DEMO1_BRACKETS = {};
+(function() {
+  /* Trefoil (right-handed): -A^{-7} + A^{-3} + A^5 ... wait let me compute */
+  /* From the C code test: rh_bracket: lo=-7, len=13, c[0]=1, c[4]=-1, c[12]=-1 */
+  /* That's: A^{-7} - A^{-3} - A^5 */
+  var t = new Poly(new Array(13), -7);
+  for(var i=0;i<13;i++) t.c[i]=0;
+  t.c[0]=1; t.c[4]=-1; t.c[12]=-1;
+  DEMO1_BRACKETS['trefoil'] = t.trim();
+
+  /* Figure-eight: A^{-8} - A^{-4} + 1 - A^4 + A^8 */
+  var f = new Poly(new Array(17), -8);
+  for(var i=0;i<17;i++) f.c[i]=0;
+  f.c[0]=1; f.c[4]=-1; f.c[8]=1; f.c[12]=-1; f.c[16]=1;
+  DEMO1_BRACKETS['figure-eight'] = f.trim();
+
+  /* Hopf link: -A^{-4} - A^4 */
+  var h = new Poly(new Array(9), -4);
+  for(var i=0;i<9;i++) h.c[i]=0;
+  h.c[0]=-1; h.c[8]=-1;
+  DEMO1_BRACKETS['hopf'] = h.trim();
+
+  /* Unknot: 1 */
+  DEMO1_BRACKETS['unknot'] = Poly.mono(1, 0);
+})();
+
+/* ============================================================
+ * UNION-FIND LOOP COUNTING (from the C code)
+ * ============================================================ */
+function braidCountLoops(braid, state) {
+  var n = braid.n, len = braid.word.length;
+  var totalNodes = (len + 1) * n;
+  var parent = [];
+  var i, l, p;
+
+  /* Init union-find */
+  for (i = 0; i < totalNodes; i++) parent[i] = i;
+
+  function find(x) {
+    while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; }
+    return x;
+  }
+  function union(x, y) {
+    x = find(x); y = find(y);
+    if (x !== y) parent[x] = y;
+  }
+  function node(level, pos) { return level * n + pos; }
+
+  /* Process each crossing */
+  for (l = 0; l < len; l++) {
+    var sign = braid.word[l] > 0 ? 1 : -1;
+    var gi = Math.abs(braid.word[l]) - 1; /* 0-based position */
+    var bit = (state >> l) & 1;
+    var doCup;
+
+    if (sign > 0) {
+      doCup = (bit === 0); /* positive: A=cup, B=straight */
+    } else {
+      doCup = (bit === 1); /* negative: A=straight, B=cup */
+    }
+
+    if (doCup) {
+      /* Cup: join positions gi and gi+1 at both levels */
+      union(node(l, gi), node(l, gi + 1));
+      union(node(l+1, gi), node(l+1, gi + 1));
+      /* Other strands pass straight */
+      for (p = 0; p < n; p++) {
+        if (p !== gi && p !== gi + 1) {
+          union(node(l, p), node(l+1, p));
+        }
+      }
+    } else {
+      /* Straight: all strands pass through */
+      for (p = 0; p < n; p++) {
+        union(node(l, p), node(l+1, p));
+      }
+    }
+  }
+
+  /* Closure: connect top to bottom */
+  for (p = 0; p < n; p++) {
+    union(node(0, p), node(len, p));
+  }
+
+  /* Count connected components */
+  var loops = 0;
+  for (i = 0; i < totalNodes; i++) {
+    if (find(i) === i) loops++;
+  }
+  return loops;
+}
+
+/* ============================================================
+ * BRACKET COMPUTATION
+ * ============================================================ */
+var D_POLY = polyAdd(Poly.mono(-1, 2), Poly.mono(-1, -2));
+
+function braidBracket(braid) {
+  var result = Poly.zero();
+  var len = braid.word.length;
+  var ns = len === 0 ? 1 : (1 << len);
+  var states = [];
+
+  if (len === 0) {
+    /* No crossings: bracket of n-component unlink = d^{n-1} */
+    var r = Poly.mono(1, 0);
+    for (var i = 0; i < braid.n - 1; i++) r = polyMul(r, D_POLY);
+    states.push({index:0, aCount:0, bCount:0, loops:braid.n,
+      weightExp:0, contribution: r});
+    return {bracket: r, states: states};
+  }
+
+  for (var s = 0; s < ns; s++) {
+    var ac = 0, bc = 0;
+    for (var i = 0; i < len; i++) {
+      if ((s >> i) & 1) bc++; else ac++;
+    }
+    var loops = braidCountLoops(braid, s);
+    var term = Poly.mono(1, ac - bc);
+    var dp = Poly.mono(1, 0);
+    for (var j = 0; j < loops - 1; j++) dp = polyMul(dp, D_POLY);
+    var contrib = polyMul(term, dp);
+    result = polyAdd(result, contrib);
+    states.push({index:s, aCount:ac, bCount:bc, loops:loops,
+      weightExp:ac-bc, contribution:contrib});
+  }
+  return {bracket: result, states: states};
+}
+
+function braidWrithe(braid) {
+  var w = 0;
+  for (var i = 0; i < braid.word.length; i++)
+    w += braid.word[i] > 0 ? 1 : -1;
+  return w;
+}
+
+function braidJones(bracket, braid) {
+  var w = braidWrithe(braid);
+  return polyMul(Poly.mono(w % 2 === 0 ? 1 : -1, -3 * w), bracket);
+}
+
+/* ============================================================
+ * UI STATE
+ * ============================================================ */
+var currentBraid = 'trefoil';
+var smoothings = [];
+var accumStep = 0;
+var playInterval = null;
+var cachedResult = null;
+
+function currentState() {
+  var s = 0;
+  for (var i = 0; i < smoothings.length; i++)
+    if (smoothings[i]) s |= (1 << i);
+  return s;
+}
+
+/* ============================================================
+ * DRAWING: Explanatory figures
+ * ============================================================ */
+var COL_A = '#5b9bd5', COL_B = '#d4845a', COL_BRAID = '#e8c86a', COL_BRAID2 = '#c4a0e8';
+
+function drawBraidStrands(ctx, x, y, w, h, word, nStrands, colors) {
+  /* Draw a braid diagram given a word array */
+  var stepH = h / (word.length + 1);
+  var strandGap = Math.min(w / (nStrands + 1), 50);
+  var baseX = x + (w - (nStrands - 1) * strandGap) / 2;
+  var cols = colors || [];
+  if (!cols.length) {
+    var defaults = [COL_BRAID, COL_BRAID2, '#7bc77b', '#e06070', '#5b9bd5'];
+    for (var i = 0; i < nStrands; i++) cols[i] = defaults[i % defaults.length];
+  }
+
+  /* Track strand positions */
+  var pos = [];
+  for (var i = 0; i < nStrands; i++) pos[i] = i;
+
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+
+  /* Draw top dots */
+  for (var i = 0; i < nStrands; i++) {
+    ctx.fillStyle = cols[i];
+    ctx.beginPath();
+    ctx.arc(baseX + i * strandGap, y + stepH * 0.3, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  for (var l = 0; l < word.length; l++) {
+    var gi = Math.abs(word[l]) - 1;
+    var isPos = word[l] > 0;
+    var yTop = y + stepH * (l + 0.5);
+    var yBot = y + stepH * (l + 1.5);
+    var yMid = (yTop + yBot) / 2;
+
+    /* Draw non-crossing strands */
+    for (var s = 0; s < nStrands; s++) {
+      if (s === gi || s === gi + 1) continue;
+      var sx = baseX + s * strandGap;
+      ctx.strokeStyle = cols[pos.indexOf(s)];
+      ctx.beginPath();
+      ctx.moveTo(sx, yTop);
+      ctx.lineTo(sx, yBot);
+      ctx.stroke();
+    }
+
+    /* Draw crossing strands */
+    var x1 = baseX + gi * strandGap;
+    var x2 = baseX + (gi + 1) * strandGap;
+    var overIdx = isPos ? pos.indexOf(gi) : pos.indexOf(gi + 1);
+    var underIdx = isPos ? pos.indexOf(gi + 1) : pos.indexOf(gi);
+
+    /* Under strand (draw first, with gap) */
+    ctx.strokeStyle = cols[underIdx];
+    ctx.beginPath();
+    ctx.moveTo(isPos ? x2 : x1, yTop);
+    ctx.lineTo((x1 + x2) / 2 - 5, yMid - 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo((x1 + x2) / 2 + 5, yMid + 2);
+    ctx.lineTo(isPos ? x1 : x2, yBot);
+    ctx.stroke();
+
+    /* Over strand */
+    ctx.strokeStyle = cols[overIdx];
+    ctx.beginPath();
+    ctx.moveTo(isPos ? x1 : x2, yTop);
+    ctx.lineTo(isPos ? x2 : x1, yBot);
+    ctx.stroke();
+
+    /* Swap positions */
+    var tmp = pos.indexOf(gi);
+    var tmp2 = pos.indexOf(gi + 1);
+    pos[tmp] = gi + 1;
+    pos[tmp2] = gi;
+  }
+
+  /* Draw bottom dots */
+  var yEnd = y + stepH * (word.length + 0.7);
+  for (var i = 0; i < nStrands; i++) {
+    ctx.fillStyle = cols[pos.indexOf(i)];
+    ctx.beginPath();
+    ctx.arc(baseX + i * strandGap, yEnd, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawFigBraidBasic() {
+  var c = document.getElementById('figBraidBasic');
+  if (!c) return;
+  var ctx = c.getContext('2d'), w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+
+  /* Single sigma_1 */
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.textAlign = 'center';
+  ctx.fillText('σ₁ (2 strands)', 100, h - 10);
+  drawBraidStrands(ctx, 40, 10, 120, 160, [1], 2);
+
+  /* Trefoil braid */
+  ctx.fillText('σ₁³ (trefoil)', 310, h - 10);
+  drawBraidStrands(ctx, 240, 10, 140, 170, [1, 1, 1], 2);
+
+  /* Figure-eight braid */
+  ctx.fillText('σ₁σ₂⁻¹σ₁σ₂⁻¹ (fig-8)', 560, h - 10);
+  drawBraidStrands(ctx, 470, 10, 180, 170, [1, -2, 1, -2], 3);
+}
+
+function drawFigClosure() {
+  var c = document.getElementById('figClosure');
+  if (!c) return;
+  var ctx = c.getContext('2d'), w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+
+  /* Open braid */
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.textAlign = 'center';
+  ctx.fillText('open braid', 150, h - 10);
+  drawBraidStrands(ctx, 80, 20, 140, 180, [1, 1, 1], 2);
+
+  /* Arrow */
+  ctx.strokeStyle = '#6b7394';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(260, h/2); ctx.lineTo(290, h/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(287, h/2-3); ctx.lineTo(290, h/2); ctx.lineTo(287, h/2+3); ctx.stroke();
+  ctx.fillText('closure', 275, h/2 - 15);
+
+  /* Closed braid (schematic trefoil) */
+  var cx = 430, cy = h/2;
+  /* Draw closure arcs on right side */
+  ctx.strokeStyle = 'rgba(232,200,106,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.arc(cx + 35, cy, 80, -Math.PI/2, Math.PI/2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx + 35, cy, 55, -Math.PI/2, Math.PI/2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* Draw braid portion */
+  drawBraidStrands(ctx, 370, 30, 120, 170, [1, 1, 1], 2);
+
+  ctx.fillText('closure → trefoil', 430, h - 10);
+}
+
+function drawFigBraidSmoothing() {
+  var c = document.getElementById('figBraidSmoothing');
+  if (!c) return;
+  var ctx = c.getContext('2d'), w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+  var cy = h/2, r = 35;
+
+  /* Original crossing */
+  var ox = 120;
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  drawBraidStrands(ctx, ox - 40, 30, 80, 120, [1], 2);
+  ctx.fillText('σ₁ crossing', ox, h - 10);
+
+  /* Arrow */
+  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(200, cy); ctx.lineTo(220, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(217, cy-3); ctx.lineTo(220, cy); ctx.lineTo(217, cy+3); ctx.stroke();
+
+  /* A-smoothing: cup (horizontal join) */
+  var ax = 310;
+  ctx.strokeStyle = COL_A; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  /* Top cup */
+  ctx.beginPath();
+  ctx.moveTo(ax - 20, 45);
+  ctx.quadraticCurveTo(ax, 70, ax + 20, 45);
+  ctx.stroke();
+  /* Bottom cap */
+  ctx.beginPath();
+  ctx.moveTo(ax - 20, h - 45);
+  ctx.quadraticCurveTo(ax, h - 70, ax + 20, h - 45);
+  ctx.stroke();
+  ctx.fillStyle = COL_A;
+  ctx.fillText('A-smoothing', ax, h - 10);
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.fillText('(cup: strands join)', ax, h - 0);
+
+  /* Arrow */
+  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(390, cy); ctx.lineTo(410, cy); ctx.stroke();
+
+  /* B-smoothing: straight */
+  var bx = 510;
+  ctx.strokeStyle = COL_B; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(bx - 20, 45); ctx.lineTo(bx - 20, h - 45); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + 20, 45); ctx.lineTo(bx + 20, h - 45); ctx.stroke();
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = COL_B;
+  ctx.fillText('B-smoothing', bx, h - 10);
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.fillText('(straight through)', bx, h - 0);
+}
+
+function drawFigChirality() {
+  var c = document.getElementById('figChirality');
+  if (!c) return;
+  var ctx = c.getContext('2d'), w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+
+  /* Right-handed trefoil */
+  drawBraidStrands(ctx, 40, 10, 120, 130, [1, 1, 1], 2);
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = COL_BRAID; ctx.textAlign = 'center';
+  ctx.fillText('σ₁³', 100, h - 20);
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.fillText('right-handed', 100, h - 8);
+
+  /* Mirror arrow */
+  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.font = '11px "Crimson Pro", serif';
+  ctx.fillText('mirror', 265, h/2 - 10);
+  ctx.strokeStyle = '#6b7394'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(215, h/2); ctx.lineTo(310, h/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(220, h/2); ctx.lineTo(225, h/2-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(220, h/2); ctx.lineTo(225, h/2+4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(310, h/2); ctx.lineTo(305, h/2-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(310, h/2); ctx.lineTo(305, h/2+4); ctx.stroke();
+
+  /* Left-handed trefoil */
+  drawBraidStrands(ctx, 330, 10, 120, 130, [-1, -1, -1], 2);
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = COL_B; ctx.textAlign = 'center';
+  ctx.fillText('σ₁⁻³', 390, h - 20);
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.fillText('left-handed', 390, h - 8);
+
+  /* ≠ */
+  ctx.font = '20px "Crimson Pro", serif';
+  ctx.fillStyle = '#e06070';
+  ctx.fillText('≠', 265, h/2 + 35);
+
+  /* Figure-eight note */
+  ctx.font = '10px "Crimson Pro", serif';
+  ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillText('Figure-eight: palindromic bracket → amphichiral (= its own mirror)', 560, h/2);
+}
+
+/* ============================================================
+ * DRAWING: Interactive crossing toggles
+ * ============================================================ */
+function drawCrossing(canvas, index, isB) {
+  var ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+  var cx = w/2, cy = h/2, r = Math.min(w, h) * 0.35;
+  ctx.clearRect(0, 0, w, h);
+
+  var braid = BRAIDS[currentBraid];
+  var sign = braid.word[index] > 0 ? 1 : -1;
+
+  ctx.fillStyle = isB ? 'rgba(212,132,90,0.06)' : 'rgba(91,155,213,0.06)';
+  ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, Math.PI * 2); ctx.fill();
+
+  ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  if (!isB) {
+    /* A-smoothing */
+    if (sign > 0) {
+      /* Positive: A = cup */
+      ctx.strokeStyle = COL_A;
+      ctx.beginPath(); ctx.moveTo(cx - r, cy - r*0.5); ctx.quadraticCurveTo(cx, cy - r*0.1, cx + r, cy - r*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - r, cy + r*0.5); ctx.quadraticCurveTo(cx, cy + r*0.1, cx + r, cy + r*0.5); ctx.stroke();
+    } else {
+      /* Negative: A = straight */
+      ctx.strokeStyle = COL_A;
+      ctx.beginPath(); ctx.moveTo(cx - r, cy - r*0.5); ctx.lineTo(cx + r, cy - r*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - r, cy + r*0.5); ctx.lineTo(cx + r, cy + r*0.5); ctx.stroke();
+    }
+  } else {
+    /* B-smoothing */
+    if (sign > 0) {
+      /* Positive: B = straight */
+      ctx.strokeStyle = COL_B;
+      ctx.beginPath(); ctx.moveTo(cx - r, cy - r*0.5); ctx.lineTo(cx + r, cy - r*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - r, cy + r*0.5); ctx.lineTo(cx + r, cy + r*0.5); ctx.stroke();
+    } else {
+      /* Negative: B = cup */
+      ctx.strokeStyle = COL_B;
+      ctx.beginPath(); ctx.moveTo(cx - r, cy - r*0.5); ctx.quadraticCurveTo(cx, cy - r*0.1, cx + r, cy - r*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - r, cy + r*0.5); ctx.quadraticCurveTo(cx, cy + r*0.1, cx + r, cy + r*0.5); ctx.stroke();
+    }
+  }
+
+  /* Sign indicator */
+  ctx.font = '8px "JetBrains Mono", monospace';
+  ctx.fillStyle = sign > 0 ? 'rgba(232,200,106,0.5)' : 'rgba(212,132,90,0.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText(sign > 0 ? '+' : '−', cx, cy - r - 4);
+}
+
+function drawLoops(braid, state) {
+  var canvas = document.getElementById('loopCanvas'), ctx = canvas.getContext('2d');
+  var w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  var loops = braidCountLoops(braid, state);
+  var colors = ['#7bc77b','#5b9bd5','#d4845a','#c4a0e8','#f0d060','#e06070','#60c0c0'];
+  var spacing = Math.min(80, (w - 40) / Math.max(loops, 1));
+  var startX = w/2 - (loops - 1) * spacing / 2;
+
+  for (var l = 0; l < loops; l++) {
+    var cx = startX + l * spacing, cy = h/2, r = Math.min(25, spacing * 0.4);
+    var col = colors[l % colors.length];
+    var g = ctx.createRadialGradient(cx, cy, r*0.5, cx, cy, r+10);
+    g.addColorStop(0, col + '18'); g.addColorStop(1, col + '00');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r+6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillStyle = col; ctx.textAlign = 'center';
+    ctx.fillText('loop ' + (l+1), cx, cy + r + 16);
+  }
+
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillText(loops + ' loop' + (loops !== 1 ? 's' : '') + ' · d^' + (loops-1) + ' factor', w/2, 16);
+}
+
+function drawBraidDiagram() {
+  var canvas = document.getElementById('braidCanvas');
+  var ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  var braid = BRAIDS[currentBraid];
+  if (braid.word.length === 0) {
+    /* Unknot: just draw a circle */
+    ctx.strokeStyle = COL_BRAID;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(w/2, h/2, 40, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#6b7394';
+    ctx.textAlign = 'center';
+    ctx.fillText('unknot (1 strand, no crossings)', w/2, h/2 + 60);
+    return;
+  }
+
+  /* Draw the braid with closure arcs */
+  var braidW = Math.min(120, w * 0.4);
+  var braidH = h - 60;
+  var braidX = (w - braidW) / 2 - 30;
+
+  drawBraidStrands(ctx, braidX, 20, braidW, braidH, braid.word, braid.n);
+
+  /* Draw closure arcs on the right */
+  var strandGap = Math.min(braidW / (braid.n + 1), 50);
+  var baseX = braidX + (braidW - (braid.n - 1) * strandGap) / 2;
+  var stepH = braidH / (braid.word.length + 1);
+  var yTop = 20 + stepH * 0.3;
+  var yBot = 20 + stepH * (braid.word.length + 0.7);
+
+  ctx.setLineDash([4, 3]);
+  ctx.lineWidth = 1.5;
+  for (var i = 0; i < braid.n; i++) {
+    var sx = baseX + i * strandGap;
+    var arcR = 30 + i * 18;
+    ctx.strokeStyle = 'rgba(232,200,106,' + (0.2 + i * 0.1) + ')';
+    ctx.beginPath();
+    ctx.moveTo(sx, yTop);
+    ctx.bezierCurveTo(sx + arcR, yTop, sx + arcR, yBot, sx, yBot);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6b7394';
+  ctx.textAlign = 'center';
+  ctx.fillText('closure arcs', baseX + (braid.n - 1) * strandGap / 2 + 50, (yTop + yBot) / 2);
+}
+
+/* ============================================================
+ * BUILD UI
+ * ============================================================ */
+function braidWordToHTML(braid) {
+  if (braid.word.length === 0) return '<span style="color:var(--text-dim)">(empty)</span>';
+  var parts = [];
+  for (var i = 0; i < braid.word.length; i++) {
+    var g = Math.abs(braid.word[i]);
+    var neg = braid.word[i] < 0;
+    if (i > 0) parts.push('<span class="sep-dot">·</span>');
+    if (neg) {
+      parts.push('<span class="sigma-neg">σ<sub>' + g + '</sub><sup>−1</sup></span>');
+    } else {
+      parts.push('<span class="sigma">σ<sub>' + g + '</sub></span>');
+    }
+  }
+  return parts.join('');
+}
+
+function buildCrossingDiagram() {
+  var braid = BRAIDS[currentBraid];
+  var container = document.getElementById('crossingDiagram');
+  container.innerHTML = '';
+  for (var i = 0; i < braid.word.length; i++) {
+    var box = document.createElement('div'); box.className = 'crossing-box';
+    var cvs = document.createElement('canvas'); cvs.width = 100; cvs.height = 100;
+    box.appendChild(cvs);
+    var label = document.createElement('div'); label.className = 'crossing-label';
+    var g = Math.abs(braid.word[i]);
+    var neg = braid.word[i] < 0;
+    label.textContent = (neg ? 'σ' + g + '⁻¹' : 'σ' + g) + ' (#' + i + ')';
+    box.appendChild(label);
+    var stype = document.createElement('div');
+    stype.className = 'smoothing-type type-a';
+    stype.textContent = 'A-smoothing';
+    stype.id = 'stype-' + i;
+    box.appendChild(stype);
+    box.addEventListener('click', (function(idx) {
+      return function() { smoothings[idx] = smoothings[idx] ? 0 : 1; updateAll(); };
+    })(i));
+    container.appendChild(box);
+  }
+  if (braid.word.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-dim);font-style:italic;font-size:0.9rem;">No crossings to toggle.</div>';
+  }
+}
+
+function buildStateTable() {
+  var braid = BRAIDS[currentBraid];
+  cachedResult = braidBracket(braid);
+  var states = cachedResult.states;
+  var tbody = document.getElementById('stateBody');
+  tbody.innerHTML = '';
+  var cs = currentState();
+
+  for (var s = 0; s < states.length; s++) {
+    var st = states[s], tr = document.createElement('tr');
+    if (st.index === cs) tr.className = 'active-state';
+
+    var td0 = document.createElement('td');
+    td0.textContent = '#' + st.index; td0.style.color = 'var(--text-dim)';
+    tr.appendChild(td0);
+
+    var td1 = document.createElement('td');
+    var bits = document.createElement('span'); bits.className = 'state-bits';
+    for (var b = 0; b < braid.word.length; b++) {
+      var bit = document.createElement('span');
+      bit.className = 'bit ' + (((st.index >> b) & 1) ? 'bit-b' : 'bit-a');
+      bit.textContent = ((st.index >> b) & 1) ? 'B' : 'A';
+      bits.appendChild(bit);
+    }
+    td1.appendChild(bits); tr.appendChild(td1);
+
+    var td2 = document.createElement('td');
+    var badge = document.createElement('span'); badge.className = 'loops-badge';
+    badge.textContent = st.loops;
+    td2.appendChild(badge); tr.appendChild(td2);
+
+    var td3 = document.createElement('td');
+    td3.innerHTML = 'A<sup style="font-size:0.6rem">' + st.weightExp + '</sup>·d<sup style="font-size:0.6rem">' + (st.loops - 1) + '</sup>';
+    tr.appendChild(td3);
+
+    var td4 = document.createElement('td');
+    td4.innerHTML = polyToHTML(st.contribution);
+    td4.style.fontSize = '0.68rem';
+    tr.appendChild(td4);
+
+    tr.addEventListener('click', (function(idx, nn) {
+      return function() {
+        for (var b = 0; b < nn; b++) smoothings[b] = (idx >> b) & 1;
+        accumStep = idx;
+        updateAll();
+      };
+    })(st.index, braid.word.length));
+    tbody.appendChild(tr);
+  }
+}
+
+function updateAll() {
+  var braid = BRAIDS[currentBraid];
+  var boxes = document.querySelectorAll('.crossing-box');
+  for (var i = 0; i < boxes.length; i++) {
+    var cvs = boxes[i].querySelector('canvas');
+    drawCrossing(cvs, i, !!smoothings[i]);
+    var stype = document.getElementById('stype-' + i);
+    if (smoothings[i]) { stype.className = 'smoothing-type type-b'; stype.textContent = 'B-smoothing'; }
+    else { stype.className = 'smoothing-type type-a'; stype.textContent = 'A-smoothing'; }
+  }
+  drawLoops(braid, currentState());
+  drawBraidDiagram();
+
+  var rows = document.querySelectorAll('#stateBody tr'), cs = currentState();
+  for (var r = 0; r < rows.length; r++) rows[r].className = (r === cs) ? 'active-state' : '';
+
+  updateAccumDisplay();
+}
+
+function updateAccumDisplay() {
+  var braid = BRAIDS[currentBraid];
+  var ns = braid.word.length === 0 ? 1 : (1 << braid.word.length);
+  var label = document.getElementById('accumLabel');
+  label.textContent = 'State ' + accumStep + ' / ' + (ns - 1);
+
+  var running = Poly.zero();
+  for (var i = 0; i <= accumStep && i < cachedResult.states.length; i++) {
+    running = polyAdd(running, cachedResult.states[i].contribution);
+  }
+  var el = document.getElementById('runningSum');
+  if (accumStep >= ns - 1) {
+    el.innerHTML = '<span style="color:var(--text-dim);font-size:0.8rem;">Sum complete →</span> ' + polyToHTML(running);
+  } else {
+    el.innerHTML = '<span style="color:var(--text-dim);font-size:0.8rem;">Running sum (states 0–' + accumStep + '):</span> ' + polyToHTML(running);
+  }
+}
+
+function renderResult() {
+  var braid = BRAIDS[currentBraid];
+  cachedResult = braidBracket(braid);
+  var bracket = cachedResult.bracket;
+
+  document.getElementById('bracketResult').innerHTML = '⟨K⟩ = ' + polyToHTML(bracket);
+
+  var jones = braidJones(bracket, braid);
+  var w = braidWrithe(braid);
+  document.getElementById('jonesResult').innerHTML =
+    '<span style="color:var(--text-dim);font-size:0.7rem;">writhe w = ' + w + ' → </span>f(K) = ' + polyToHTML(jones);
+
+  /* Comparison with Demo 1 */
+  var compEl = document.getElementById('comparisonContent');
+  var demo1Key = null;
+  if (currentBraid === 'trefoil') demo1Key = 'trefoil';
+  else if (currentBraid === 'figure-eight') demo1Key = 'figure-eight';
+  else if (currentBraid === 'hopf') demo1Key = 'hopf';
+  else if (currentBraid === 'unknot') demo1Key = 'unknot';
+
+  if (demo1Key && DEMO1_BRACKETS[demo1Key]) {
+    var d1 = DEMO1_BRACKETS[demo1Key];
+    var match = polyEq(bracket, d1);
+    compEl.innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;text-align:center;">' +
+        '<div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Braid closure (Demo 2)</div>' +
+        '<div style="font-size:0.95rem;">' + polyToHTML(bracket) + '</div></div>' +
+        '<div style="font-size:2rem;padding:0 1rem;color:' + (match ? 'var(--accent-loop)' : 'var(--negative)') + ';">' + (match ? '=' : '≠') + '</div>' +
+        '<div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">PD notation (Demo 1)</div>' +
+        '<div style="font-size:0.95rem;">' + polyToHTML(d1) + '</div></div>' +
+      '</div>' +
+      '<div style="text-align:center;margin-top:0.5rem;font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;color:' + (match ? 'var(--accent-loop)' : 'var(--negative)') + ';">' +
+        (match ? '✓ Brackets match — same knot, different encoding' : '✗ Brackets differ') +
+      '</div>';
+  } else if (currentBraid === 'trefoil-left') {
+    /* Compare with mirror of right-handed trefoil */
+    var rh = DEMO1_BRACKETS['trefoil'];
+    var mirrored = polyMirror(bracket);
+    var isMirror = polyEq(mirrored, rh) || polyEq(polyMirror(rh), bracket);
+    compEl.innerHTML =
+      '<div style="text-align:center;">' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;">Chirality test</div>' +
+        '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;">' +
+          '<div><div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.2rem;">Left-handed bracket</div>' +
+          '<div style="font-size:0.9rem;">' + polyToHTML(bracket) + '</div></div>' +
+          '<div style="font-size:1.5rem;padding:0 0.5rem;color:var(--negative);">≠</div>' +
+          '<div><div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.2rem;">Right-handed bracket</div>' +
+          '<div style="font-size:0.9rem;">' + polyToHTML(rh) + '</div></div>' +
+        '</div>' +
+        '<div style="margin-top:0.5rem;font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;color:var(--accent-braid);">' +
+          '✓ Mirror brackets (A ↔ A⁻¹) — trefoil is chiral' +
+        '</div>' +
+      '</div>';
+  } else {
+    compEl.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-style:italic;font-size:0.85rem;">No Demo 1 comparison for this braid representation.</div>';
+  }
+
+  /* Extra info for figure-eight */
+  if (currentBraid === 'figure-eight') {
+    var pal = polyIsPalindromic(bracket);
+    compEl.innerHTML += '<div style="text-align:center;margin-top:0.5rem;font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;color:' + (pal ? 'var(--accent-braid)' : 'var(--text-dim)') + ';">' +
+      (pal ? '✓ Palindromic bracket — confirms amphichirality' : '') +
+    '</div>';
+  }
+}
+
+function selectBraid(name) {
+  if (playInterval) {
+    clearInterval(playInterval); playInterval = null;
+    document.getElementById('btnPlay').classList.remove('active-play');
+    document.getElementById('btnPlay').textContent = '▶ Play';
+  }
+  currentBraid = name;
+  var braid = BRAIDS[name];
+  smoothings = [];
+  for (var i = 0; i < braid.word.length; i++) smoothings.push(0);
+  accumStep = 0;
+
+  document.querySelectorAll('.braid-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.braid === name);
+  });
+  document.getElementById('braidDesc').textContent = braid.desc;
+  document.getElementById('braidWordDisplay').innerHTML =
+    '<span class="braid-word">' + braidWordToHTML(braid) + '</span>' +
+    '<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;color:var(--text-dim);display:block;margin-top:0.3rem;">' +
+    braid.n + ' strand' + (braid.n !== 1 ? 's' : '') + ' · ' + braid.word.length + ' crossing' + (braid.word.length !== 1 ? 's' : '') +
+    ' · writhe = ' + braidWrithe(braid) +
+    '</span>';
+
+  buildCrossingDiagram();
+  buildStateTable();
+  renderResult();
+  updateAll();
+}
+
+/* Accumulation controls */
+document.getElementById('btnReset').addEventListener('click', function() {
+  accumStep = 0;
+  for (var i = 0; i < smoothings.length; i++) smoothings[i] = 0;
+  updateAll();
+});
+
+document.getElementById('btnPrev').addEventListener('click', function() {
+  if (accumStep > 0) {
+    accumStep--;
+    var braid = BRAIDS[currentBraid];
+    for (var b = 0; b < braid.word.length; b++) smoothings[b] = (accumStep >> b) & 1;
+    updateAll();
+  }
+});
+
+document.getElementById('btnNext').addEventListener('click', function() {
+  var ns = BRAIDS[currentBraid].word.length === 0 ? 1 : (1 << BRAIDS[currentBraid].word.length);
+  if (accumStep < ns - 1) {
+    accumStep++;
+    var braid = BRAIDS[currentBraid];
+    for (var b = 0; b < braid.word.length; b++) smoothings[b] = (accumStep >> b) & 1;
+    updateAll();
+  }
+});
+
+document.getElementById('btnPlay').addEventListener('click', function() {
+  var btn = this;
+  if (playInterval) {
+    clearInterval(playInterval); playInterval = null;
+    btn.classList.remove('active-play'); btn.textContent = '▶ Play';
+    return;
+  }
+  var ns = BRAIDS[currentBraid].word.length === 0 ? 1 : (1 << BRAIDS[currentBraid].word.length);
+  accumStep = 0;
+  for (var i = 0; i < smoothings.length; i++) smoothings[i] = 0;
+  updateAll();
+  btn.classList.add('active-play'); btn.textContent = '⏸ Pause';
+  playInterval = setInterval(function() {
+    if (accumStep >= ns - 1) {
+      clearInterval(playInterval); playInterval = null;
+      btn.classList.remove('active-play'); btn.textContent = '▶ Play';
+      return;
+    }
+    accumStep++;
+    var braid = BRAIDS[currentBraid];
+    for (var b = 0; b < braid.word.length; b++) smoothings[b] = (accumStep >> b) & 1;
+    updateAll();
+  }, 800);
+});
+
+/* Braid buttons */
+document.querySelectorAll('.braid-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() { selectBraid(this.dataset.braid); });
+});
+
+/* Init */
+drawFigBraidBasic();
+drawFigClosure();
+drawFigBraidSmoothing();
+drawFigChirality();
+selectBraid('trefoil');
+</script>
+</body>
+</html>

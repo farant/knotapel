@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperley-Lieb Modules & the Bracket — Demo 3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap">
+<style>
+:root {
+  --bg: #0c0e13;
+  --surface: #14171e;
+  --surface2: #1a1e28;
+  --surface3: #1f2433;
+  --border: #2a2f3d;
+  --text: #d4d8e4;
+  --text-dim: #6b7394;
+  --text-bright: #eef0f6;
+  --accent-a: #5b9bd5;
+  --accent-b: #d4845a;
+  --accent-loop: #7bc77b;
+  --accent-poly: #c4a0e8;
+  --accent-braid: #e8c86a;
+  --accent-tl: #e07070;
+  --highlight: #f0d060;
+  --negative: #e06070;
+  --positive: #60c080;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg, #0c0e13);
+  background-color: #0c0e13;
+  color: var(--text, #d4d8e4);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 20%, rgba(224,112,112,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+header { text-align: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+header h1 { font-weight: 300; font-size: 2.4rem; letter-spacing: 0.03em; color: var(--text-bright); margin-bottom: 0.3rem; }
+header h1 em { color: var(--accent-tl); font-style: italic; }
+header .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+header .demo-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--accent-tl); border: 1px solid rgba(224,112,112,0.3); padding: 2px 8px; border-radius: 2px; margin-top: 0.5rem; letter-spacing: 0.1em; }
+
+.prose { margin-bottom: 2.5rem; }
+.prose h2 { font-weight: 400; font-size: 1.5rem; color: var(--text-bright); margin-bottom: 0.75rem; }
+.prose h2 .num { color: var(--accent-tl); font-style: italic; margin-right: 0.3rem; }
+.prose p { margin-bottom: 1rem; }
+.prose p.dim { color: var(--text-dim); font-style: italic; }
+.key-term { color: var(--accent-tl); font-weight: 500; }
+.key-term-poly { color: var(--accent-poly); font-weight: 500; }
+.key-term-braid { color: var(--accent-braid); font-weight: 500; }
+
+code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--surface2); padding: 1px 5px; border-radius: 2px; color: var(--accent-poly); }
+
+.recap-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent-braid); border-radius: 3px; padding: 1.25rem; margin-bottom: 2.5rem; }
+.recap-box .recap-title { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--accent-braid); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+.recap-box p { margin-bottom: 0.75rem; font-size: 0.95rem; }
+.recap-box p:last-child { margin-bottom: 0; }
+
+.formula-box { background: var(--surface); border-left: 3px solid var(--accent-tl); padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; font-family: 'Crimson Pro', serif; font-size: 1.15rem; text-align: center; line-height: 1.9; }
+.formula-box .var-a { color: var(--accent-poly); font-style: italic; }
+.formula-box sup { font-size: 0.7em; }
+.formula-box .label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; text-align: left; }
+
+.step-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; margin: 1rem 0; }
+.step-box .step-num { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent-tl); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+
+.figure { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1.25rem; margin: 1.25rem 0 1.5rem; text-align: center; }
+.figure canvas { display: block; margin: 0 auto; }
+.figure-caption { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); margin-top: 0.75rem; letter-spacing: 0.03em; line-height: 1.5; }
+
+.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; margin-bottom: 2.5rem; }
+.toc-title { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+.toc a { display: block; color: var(--text-dim); text-decoration: none; font-size: 0.92rem; padding: 0.2rem 0; transition: color 0.2s; }
+.toc a:hover { color: var(--accent-tl); }
+.toc a .num { color: var(--accent-tl); font-style: italic; margin-right: 0.4rem; }
+
+.sep { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+
+/* MATRIX DISPLAY */
+.mat-inline { display: inline-block; vertical-align: middle; margin: 0.5rem 0.3rem; }
+.mat-table { border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; margin: 0 auto; }
+.mat-table td { padding: 0.3rem 0.6rem; text-align: center; border: 1px solid var(--border); min-width: 60px; background: transparent; }
+.mat-table .mat-header { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; border: none; padding-bottom: 0.5rem; }
+.mat-bracket-left { border-left: 2px solid var(--accent-tl) !important; }
+.mat-bracket-right { border-right: 2px solid var(--accent-tl) !important; }
+
+/* INTERACTIVE TOOL */
+.tool-header { text-align: center; margin-bottom: 1.5rem; }
+.tool-header h2 { font-weight: 300; font-size: 1.6rem; color: var(--text-bright); margin-bottom: 0.3rem; }
+.tool-header .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.06em; }
+
+.braid-selector { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.braid-btn { font-family: 'Crimson Pro', serif; font-size: 1rem; padding: 0.55rem 1.3rem; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; border-radius: 2px; transition: all 0.25s ease; }
+.braid-btn:hover { border-color: var(--accent-tl); color: var(--text); }
+.braid-btn.active { background: var(--surface2); border-color: var(--accent-tl); color: var(--accent-tl); box-shadow: 0 0 12px rgba(224,112,112,0.1); }
+
+.braid-desc { text-align: center; font-size: 0.95rem; color: var(--text-dim); margin-bottom: 1.5rem; font-style: italic; min-height: 2.5em; }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1.25rem; margin-bottom: 1.5rem; animation: fadeIn 0.4s ease both; }
+.panel-title { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+@media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
+
+.full-width { grid-column: 1 / -1; }
+
+.polynomial-display { font-family: 'Crimson Pro', serif; font-size: 1.3rem; text-align: center; padding: 0.75rem 1rem; line-height: 1.8; word-break: break-word; }
+.polynomial-display .coeff-pos { color: var(--positive); }
+.polynomial-display .coeff-neg { color: var(--negative); }
+.polynomial-display .var-a { color: var(--accent-poly); font-style: italic; }
+.polynomial-display .sup { font-size: 0.8em; vertical-align: super; }
+
+.info-row { display: flex; gap: 2rem; justify-content: center; margin-top: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-dim); flex-wrap: wrap; }
+.info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot-tl { background: var(--accent-tl); }
+.dot-braid { background: var(--accent-braid); }
+.dot-poly { background: var(--accent-poly); }
+.dot-loop { background: var(--accent-loop); }
+
+/* Step-by-step multiplication */
+.step-display { margin: 1rem 0; }
+.step-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(42,47,61,0.5); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; transition: background 0.15s; }
+.step-item:hover { background: rgba(224,112,112,0.04); }
+.step-item.active-step { background: rgba(224,112,112,0.08); }
+.step-item .step-label { color: var(--accent-tl); min-width: 80px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.step-item .step-op { color: var(--text-dim); min-width: 30px; text-align: center; }
+
+/* Verify badge */
+.verify-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 2px; }
+.verify-pass { background: rgba(96,192,128,0.1); color: var(--positive); border: 1px solid rgba(96,192,128,0.2); }
+.verify-fail { background: rgba(224,96,112,0.1); color: var(--negative); border: 1px solid rgba(224,96,112,0.2); }
+
+/* Module cards */
+.module-cards { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.75rem; align-items: start; margin: 1rem 0; }
+.module-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1rem; }
+.module-card .module-name { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent-tl); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.module-plus { font-size: 1.5rem; color: var(--text-dim); align-self: center; padding-top: 1.5rem; }
+
+/* Accum controls */
+.accum-controls { display: flex; gap: 0.75rem; justify-content: center; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; }
+.accum-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.4rem 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+.accum-btn:hover { border-color: var(--accent-tl); color: var(--text); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Temperley-Lieb <em>Modules</em></h1>
+    <div class="subtitle">From exponential state sums to polynomial-time matrix traces</div>
+    <div class="demo-tag">Demo 3 &middot; Building on Demos 1 &amp; 2</div>
+  </header>
+
+  <!-- RECAP -->
+  <div class="recap-box">
+    <div class="recap-title">Recap from Demos 1 &amp; 2</div>
+    <p>In <strong>Demo 1</strong> we computed the <span class="key-term-poly">Kauffman bracket</span> by brute force: resolve every crossing as A or B, count loops, sum 2<sup>n</sup> weighted terms. In <strong>Demo 2</strong> we showed that braids give a different encoding of the same knots, and the same state sum on the braid closure produces the same bracket. But both approaches cost 2<sup>n</sup>.</p>
+    <p>This demo introduces the <span class="key-term">Temperley-Lieb algebra</span> — the algebraic structure that lurks behind the smoothing operation. By representing TL generators as matrices and braid generators as matrix products, we can compute the bracket via <em>traces</em> of matrix products: a polynomial-time operation. The key verification: the matrix trace agrees with the state-sum oracle for every test braid.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#sec-tl"><span class="num">1.</span> The Temperley-Lieb algebra</a>
+    <a href="#sec-diagrams"><span class="num">2.</span> TL diagrams and the cup-cap picture</a>
+    <a href="#sec-modules"><span class="num">3.</span> Standard modules: W₁ and W₃</a>
+    <a href="#sec-matrices"><span class="num">4.</span> Explicit matrices for TL₃</a>
+    <a href="#sec-braidrep"><span class="num">5.</span> The braid representation</a>
+    <a href="#sec-inverse"><span class="num">6.</span> Inverses and the key cancellation</a>
+    <a href="#sec-decomp"><span class="num">7.</span> Full bracket via module decomposition</a>
+    <a href="#sec-code"><span class="num">8.</span> What the C code does</a>
+    <a href="#sec-tool"><span class="num">9.</span> Interactive explorer</a>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="prose" id="sec-tl">
+    <h2><span class="num">1.</span> The Temperley-Lieb algebra</h2>
+    <p>Behind every smoothing operation in the Kauffman bracket lies an algebraic structure. When we resolve a crossing as an A-smoothing, we are applying a specific operation to the strands: cupping two adjacent strands together (joining them with a cap on top and a cup on the bottom). The <span class="key-term">Temperley-Lieb algebra</span> TL<sub>n</sub> is the algebra generated by these cup-cap operations.</p>
+    <p>For <em>n</em> strands, TL<sub>n</sub> has generators U₁, U₂, …, U<sub>n−1</sub>, where U<sub>i</sub> cups together strands <em>i</em> and <em>i</em>+1. These generators satisfy three fundamental relations:</p>
+
+    <div class="formula-box">
+      <span class="label">Temperley-Lieb relations</span>
+      U<sub>i</sub>² = δ · U<sub>i</sub> &nbsp;&nbsp;&nbsp; (idempotent up to δ)<br>
+      U<sub>i</sub> U<sub>j</sub> = U<sub>j</sub> U<sub>i</sub> &nbsp; when |<em>i</em>−<em>j</em>| ≥ 2 &nbsp;&nbsp;&nbsp; (far-apart generators commute)<br>
+      U<sub>i</sub> U<sub>i±1</sub> U<sub>i</sub> = U<sub>i</sub> &nbsp;&nbsp;&nbsp; (the Jones relation)
+    </div>
+
+    <p>Here δ = −<em>A</em>² − <em>A</em>⁻² is the same loop value from the bracket. The first relation says: if you cup strands <em>i</em> and <em>i</em>+1, then cup them again, you get the same configuration but with an extra loop — and each loop is worth δ. The third relation is deeper: it says that cupping, then doing a neighbouring cup, then cupping again, just gives the original cup back. This "absorption" property is what makes the TL algebra finite-dimensional despite being generated by repeated compositions.</p>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="prose" id="sec-diagrams">
+    <h2><span class="num">2.</span> TL diagrams and the cup-cap picture</h2>
+    <p>Each element of TL<sub>n</sub> can be drawn as a <span class="key-term">diagram</span>: <em>n</em> points on top, <em>n</em> points on bottom, connected by non-crossing curves. The identity has <em>n</em> vertical through-lines. The generator U<sub>i</sub> has a cap connecting points <em>i</em> and <em>i</em>+1 on top, a cup connecting them on the bottom, and through-lines elsewhere.</p>
+
+    <div class="figure">
+      <canvas id="figTLDiagrams" width="700" height="200"></canvas>
+      <div class="figure-caption">TL₃ diagrams. Left: identity (3 through-lines). Center: U₁ (cap on 1-2, through-line on 3). Right: U₂ (through-line on 1, cap on 2-3).</div>
+    </div>
+
+    <p>Multiplication is composition: to multiply diagram <em>A</em> by diagram <em>B</em>, stack <em>A</em> on top of <em>B</em> and connect the bottom points of <em>A</em> to the top points of <em>B</em>. Any closed loops that form in the middle are removed and contribute a factor of δ each. The remaining connected curves form the product diagram.</p>
+
+    <p>The number of <span class="key-term">through-lines</span> (strands that go from top to bottom without being cupped) is an important invariant of each diagram. The identity has <em>n</em> through-lines; U<sub>i</sub> has <em>n</em>−2 through-lines. The through-line count can only decrease (or stay the same) under multiplication — it never increases.</p>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="prose" id="sec-modules">
+    <h2><span class="num">3.</span> Standard modules: W₁ and W₃</h2>
+    <p>To turn the abstract algebra into concrete matrices, we need a <span class="key-term">representation</span>: a way to assign a matrix to each generator such that the TL relations are satisfied. The natural representations of TL<sub>n</sub> are its <span class="key-term">standard modules</span> W<sub>k</sub>, indexed by the number of "defects" (through-lines in the basis diagrams).</p>
+
+    <p>For TL₃, the defect count must have the same parity as <em>n</em> = 3 (odd). So the modules are:</p>
+
+    <div class="step-box">
+      <div class="step-num">W₃ — the 1-dimensional module (3 defects)</div>
+      <p>Basis: the single diagram with 3 through-lines (the identity). Since U<sub>i</sub> reduces through-lines by 2, and you cannot go from 3 to 1 defect within W₃, both U₁ and U₂ act as <strong>zero</strong>. This is the trivial module. Dimension = 1.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">W₁ — the 2-dimensional module (1 defect)</div>
+      <p>Basis: diagrams with exactly 1 through-line and 1 cap. There are two such diagrams:<br>
+      <strong>e<sub>a</sub></strong>: cap on positions 1-2, through-line at position 3.<br>
+      <strong>e<sub>b</sub></strong>: cap on positions 2-3, through-line at position 1.<br>
+      This is the interesting module where the TL algebra acts non-trivially. Dimension = 2.</p>
+    </div>
+
+    <p>The dimensions follow from the ballot-number formula: dim(W<sub>k</sub>) = C(<em>n</em>, (<em>n</em>−<em>k</em>)/2) − C(<em>n</em>, (<em>n</em>−<em>k</em>)/2 − 1). For W₁: C(3,1) − C(3,0) = 3 − 1 = 2. For W₃: C(3,0) − C(3,−1) = 1 − 0 = 1.</p>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="prose" id="sec-matrices">
+    <h2><span class="num">4.</span> Explicit matrices for TL₃</h2>
+    <p>Working out the action of U₁ and U₂ on the basis {e<sub>a</sub>, e<sub>b</sub>} of W₁ by composing diagrams gives:</p>
+
+    <div class="formula-box">
+      <span class="label">TL₃ generators on W₁ (2×2 matrices)</span>
+      U₁ = <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">[[δ, 1], [0, 0]]</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      U₂ = <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">[[0, 0], [1, δ]]</span>
+    </div>
+
+    <p>These matrices encode how each generator transforms the basis diagrams. For instance, U₁ acting on e<sub>a</sub> (cap on 1-2, through at 3) gives δ · e<sub>a</sub> — the cap absorbs itself with a loop factor. U₁ acting on e<sub>b</sub> (cap on 2-3, through at 1) gives e<sub>a</sub> — the cup-cap at positions 1-2 reconnects the through-line.</p>
+    <p>The C code verifies all four TL relations for these matrices: U₁² = δU₁, U₂² = δU₂, U₁U₂U₁ = U₁, and U₂U₁U₂ = U₂. All four pass.</p>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="prose" id="sec-braidrep">
+    <h2><span class="num">5.</span> The braid representation</h2>
+    <p>The Kauffman bracket resolves each crossing as <em>A</em> · (identity) + <em>A</em>⁻¹ · (cup-cap). In algebraic terms, the braid generator σ<sub>i</sub> maps to:</p>
+
+    <div class="formula-box">
+      <span class="label">Braid representation</span>
+      ρ(σ<sub>i</sub>) = <span class="var-a">A</span>⁻¹ · I + <span class="var-a">A</span> · U<sub>i</sub><br>
+      ρ(σ<sub>i</sub>⁻¹) = <span class="var-a">A</span> · I + <span class="var-a">A</span>⁻¹ · U<sub>i</sub>
+    </div>
+
+    <p>On W₁ these are 2×2 matrices with polynomial entries. On W₃ (where U<sub>i</sub> = 0), the positive generator becomes the scalar <em>A</em>⁻¹ and the negative generator becomes <em>A</em>.</p>
+
+    <p>For a braid word σ<sub>i₁</sub><sup>e₁</sup> · σ<sub>i₂</sub><sup>e₂</sup> · … · σ<sub>iₖ</sub><sup>eₖ</sup>, the representation is simply the matrix product ρ(σ<sub>i₁</sub><sup>e₁</sup>) · ρ(σ<sub>i₂</sub><sup>e₂</sup>) · … · ρ(σ<sub>iₖ</sub><sup>eₖ</sup>). This is a sequence of <em>k</em> matrix multiplications — <em>linear</em> in the number of crossings, not exponential.</p>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="prose" id="sec-inverse">
+    <h2><span class="num">6.</span> Inverses and the key cancellation</h2>
+    <p>A natural worry: does ρ(σ<sub>i</sub>) have an inverse? If σ<sub>i</sub> and σ<sub>i</sub>⁻¹ are inverses in the braid group, their images should multiply to the identity. Let us check:</p>
+
+    <div class="formula-box">
+      <span class="label">The key cancellation</span>
+      ρ(σ<sub>i</sub>) · ρ(σ<sub>i</sub>⁻¹) = (<span class="var-a">A</span>⁻¹I + <span class="var-a">A</span>U)(<span class="var-a">A</span>I + <span class="var-a">A</span>⁻¹U)<br>
+      = I + <span class="var-a">A</span>⁻²U + <span class="var-a">A</span>²U + U²<br>
+      = I + (<span class="var-a">A</span>² + <span class="var-a">A</span>⁻² + δ) · U<br>
+      = I + 0 · U = <strong>I</strong>
+    </div>
+
+    <p>The miraculous cancellation: <em>A</em>² + <em>A</em>⁻² + δ = <em>A</em>² + <em>A</em>⁻² + (−<em>A</em>² − <em>A</em>⁻²) = 0. This is not a coincidence — it is <em>why</em> δ has the value it does. The loop value δ = −<em>A</em>² − <em>A</em>⁻² is precisely the value that makes the braid representation well-defined (invertible). The C code verifies g₁ · g₁⁻¹ = I and g₂ · g₂⁻¹ = I.</p>
+
+    <p>The code also verifies the <span class="key-term-braid">braid relation</span>: g₁g₂g₁ = g₂g₁g₂ (the Yang-Baxter equation). This confirms that ρ is a genuine representation of the braid group, not just a formal construction.</p>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="prose" id="sec-decomp">
+    <h2><span class="num">7.</span> Full bracket via module decomposition</h2>
+    <p>The bracket of a 3-strand braid closure is recovered by combining the traces from <em>both</em> modules W₁ and W₃, weighted by their <span class="key-term">quantum dimensions</span>:</p>
+
+    <div class="formula-box">
+      <span class="label">Module decomposition formula</span>
+      ⟨closure(b)⟩ = 1 · tr<sub>W₁</sub>(ρ(b)) + (<span class="var-a">A</span>⁻⁴ + <span class="var-a">A</span>⁴) · tr<sub>W₃</sub>(ρ(b))
+    </div>
+
+    <p>The coefficient 1 for W₁ and (<em>A</em>⁻⁴ + <em>A</em>⁴) for W₃ are the quantum dimensions of these modules. On W₃, since all U<sub>i</sub> = 0, the representation reduces to scalars: each positive crossing contributes <em>A</em>⁻¹ and each negative crossing contributes <em>A</em>. So the W₃ trace is simply <em>A</em><sup>−(#pos) + (#neg)</sup>.</p>
+
+    <p>The C code verifies this decomposition for five different 3-strand braids: the figure-eight, the trefoil, the mirror trefoil, the identity (3-component unlink), and a single crossing. In every case, the module formula matches the state-sum oracle from Demo 2 exactly.</p>
+
+    <p>This is the central result of Demo 3: the exponential state sum and the polynomial-time matrix trace compute the <em>same</em> invariant. The matrix approach is not an approximation — it is an exact algebraic reformulation.</p>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="prose" id="sec-code">
+    <h2><span class="num">8.</span> What the C code does</h2>
+
+    <div class="step-box">
+      <div class="step-num">Part A: TL relations</div>
+      <p>Constructs the 2×2 matrices U₁ and U₂ for TL₃ and verifies all four defining relations: U₁² = δU₁, U₂² = δU₂, U₁U₂U₁ = U₁, U₂U₁U₂ = U₂.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Part B: Braid inverses</div>
+      <p>Constructs g<sub>i</sub> = A⁻¹I + AU<sub>i</sub> and g<sub>i</sub>⁻¹ = AI + A⁻¹U<sub>i</sub>, then verifies g₁·g₁⁻¹ = I and g₂·g₂⁻¹ = I.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Part C: Yang-Baxter</div>
+      <p>Verifies the braid relation g₁g₂g₁ = g₂g₁g₂ and the inverse version g₁⁻¹g₂⁻¹g₁⁻¹ = g₂⁻¹g₁⁻¹g₂⁻¹.</p>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">Part D: Full bracket via both modules</div>
+      <p>For each test braid, computes tr<sub>W₁</sub>(product) and tr<sub>W₃</sub>(product), combines them with quantum dimension weights, and compares against the state-sum oracle. All five tests pass.</p>
+    </div>
+
+    <p class="dim">The interactive tool below implements the same 2×2 polynomial matrix arithmetic and module decomposition. The state-sum oracle is also computed for verification.</p>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 9: INTERACTIVE TOOL -->
+  <div id="sec-tool">
+    <div class="tool-header">
+      <h2>Interactive Explorer</h2>
+      <div class="subtitle">Watch the matrix product build step by step, verify against the state-sum oracle</div>
+    </div>
+
+    <div class="braid-selector" id="braidSelector">
+      <button class="braid-btn active" data-braid="figure-eight">Figure-Eight</button>
+      <button class="braid-btn" data-braid="trefoil3">Trefoil (3-strand)</button>
+      <button class="braid-btn" data-braid="mirror3">Mirror Trefoil</button>
+      <button class="braid-btn" data-braid="identity3">Identity (unlink)</button>
+      <button class="braid-btn" data-braid="single">Single σ₁</button>
+    </div>
+
+    <div class="braid-desc" id="braidDesc">Figure-eight: σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands. Writhe = 0.</div>
+
+    <div class="main-grid">
+      <!-- TL generators -->
+      <div class="panel">
+        <div class="panel-title">TL₃ generators on W₁ (2×2 over ℤ[A,A⁻¹])</div>
+        <div id="tlGenerators"></div>
+      </div>
+
+      <!-- Braid generators -->
+      <div class="panel">
+        <div class="panel-title">Braid representation on W₁</div>
+        <div id="braidGenerators"></div>
+      </div>
+
+      <!-- Step-by-step multiplication on W1 -->
+      <div class="panel full-width">
+        <div class="panel-title">Matrix product on W₁: step-by-step</div>
+        <div id="stepsW1"></div>
+        <div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Trace of product (W₁)</div>
+          <div class="polynomial-display" id="traceW1" style="font-size:1.1rem;"></div>
+        </div>
+      </div>
+
+      <!-- Module decomposition -->
+      <div class="panel full-width">
+        <div class="panel-title">Module decomposition: ⟨K⟩ = 1·tr(W₁) + (A⁻⁴+A⁴)·tr(W₃)</div>
+        <div class="module-cards" id="moduleCards">
+          <div class="module-card">
+            <div class="module-name">W₁ (dim 2)</div>
+            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.3rem;">coefficient: 1</div>
+            <div style="font-size:0.8rem;">trace = <span id="trW1Val"></span></div>
+            <div style="font-size:0.8rem;margin-top:0.2rem;">contribution = <span id="contribW1"></span></div>
+          </div>
+          <div class="module-plus">+</div>
+          <div class="module-card">
+            <div class="module-name">W₃ (dim 1)</div>
+            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.3rem;">coefficient: A⁻⁴ + A⁴</div>
+            <div style="font-size:0.8rem;">trace = <span id="trW3Val"></span></div>
+            <div style="font-size:0.8rem;margin-top:0.2rem;">contribution = <span id="contribW3"></span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;text-align:center;">Bracket from modules</div>
+          <div class="polynomial-display" id="bracketModules"></div>
+        </div>
+
+        <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;text-align:center;">State-sum oracle (Demo 2)</div>
+          <div class="polynomial-display" id="bracketOracle"></div>
+        </div>
+
+        <div style="text-align:center;margin-top:0.75rem;" id="verifyBadge"></div>
+
+        <div class="info-row">
+          <span><span class="dot dot-tl"></span> TL algebra</span>
+          <span><span class="dot dot-braid"></span> braid word</span>
+          <span><span class="dot dot-poly"></span> polynomial</span>
+          <span><span class="dot dot-loop"></span> verified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+ * POLYNOMIAL ARITHMETIC
+ * ============================================================ */
+function Poly(c,lo){this.c=c?c.slice():[];this.lo=lo||0;}
+Poly.zero=function(){return new Poly([],0);};
+Poly.mono=function(coeff,exp){if(coeff===0)return Poly.zero();return new Poly([coeff],exp);};
+Poly.prototype.trim=function(){var a=0,b=this.c.length-1;while(a<=b&&this.c[a]===0)a++;
+  if(a>b){this.c=[];this.lo=0;return this;}while(b>a&&this.c[b]===0)b--;
+  this.c=this.c.slice(a,b+1);this.lo+=a;return this;};
+function polyAdd(a,b){if(!a.c.length)return new Poly(b.c,b.lo);if(!b.c.length)return new Poly(a.c,a.lo);
+  var lo=Math.min(a.lo,b.lo),hi=Math.max(a.lo+a.c.length-1,b.lo+b.c.length-1);
+  var c=new Array(hi-lo+1),i;for(i=0;i<c.length;i++)c[i]=0;
+  for(i=0;i<a.c.length;i++)c[a.lo+i-lo]+=a.c[i];for(i=0;i<b.c.length;i++)c[b.lo+i-lo]+=b.c[i];
+  return new Poly(c,lo).trim();}
+function polyMul(a,b){if(!a.c.length||!b.c.length)return Poly.zero();
+  var len=a.c.length+b.c.length-1,c=new Array(len),i,j;for(i=0;i<len;i++)c[i]=0;
+  for(i=0;i<a.c.length;i++)for(j=0;j<b.c.length;j++)c[i+j]+=a.c[i]*b.c[j];
+  return new Poly(c,a.lo+b.lo).trim();}
+function polyEq(a,b){if(a.c.length!==b.c.length)return false;if(!a.c.length)return true;
+  if(a.lo!==b.lo)return false;for(var i=0;i<a.c.length;i++)if(a.c[i]!==b.c[i])return false;return true;}
+function polyToHTML(p){if(!p.c.length)return'<span class="coeff-pos">0</span>';var parts=[];
+  for(var i=0;i<p.c.length;i++){if(p.c[i]===0)continue;var e=p.lo+i,coeff=p.c[i],s='';
+  if(parts.length>0)s+=coeff>0?' + ':' − ';else if(coeff<0)s+='−';
+  var ac=Math.abs(coeff),cls=coeff>0?'coeff-pos':'coeff-neg';
+  if(ac!==1||e===0)s+=ac;if(e===1)s+='<span class="var-a">A</span>';
+  else if(e===-1)s+='<span class="var-a">A</span><span class="sup">−1</span>';
+  else if(e!==0)s+='<span class="var-a">A</span><span class="sup">'+e+'</span>';
+  parts.push('<span class="'+cls+'">'+s+'</span>');}return parts.join('');}
+function polyToText(p){if(!p.c.length)return'0';var parts=[];
+  for(var i=0;i<p.c.length;i++){if(p.c[i]===0)continue;var e=p.lo+i,c=p.c[i],s='';
+  if(parts.length>0)s+=c>0?' + ':' - ';else if(c<0)s+='-';var ac=Math.abs(c);
+  if(ac!==1||e===0)s+=ac;if(e===1)s+='A';else if(e===-1)s+='A⁻¹';
+  else if(e>0)s+='A^'+e;else if(e<0)s+='A^('+e+')';parts.push(s);}return parts.join('');}
+
+/* ============================================================
+ * 2x2 MATRIX OVER POLYNOMIAL RING
+ * ============================================================ */
+function Mat2(m){this.m=m||[[Poly.zero(),Poly.zero()],[Poly.zero(),Poly.zero()]];}
+Mat2.identity=function(){return new Mat2([[Poly.mono(1,0),Poly.zero()],[Poly.zero(),Poly.mono(1,0)]]);};
+Mat2.zero=function(){return new Mat2();};
+function mat2Mul(A,B){var R=Mat2.zero(),i,j,k;
+  for(i=0;i<2;i++)for(j=0;j<2;j++){var s=Poly.zero();
+  for(k=0;k<2;k++)s=polyAdd(s,polyMul(A.m[i][k],B.m[k][j]));R.m[i][j]=s;}return R;}
+function mat2Scale(M,s){var R=Mat2.zero();for(var i=0;i<2;i++)for(var j=0;j<2;j++)R.m[i][j]=polyMul(M.m[i][j],s);return R;}
+function mat2Add(A,B){var R=Mat2.zero();for(var i=0;i<2;i++)for(var j=0;j<2;j++)R.m[i][j]=polyAdd(A.m[i][j],B.m[i][j]);return R;}
+function mat2Trace(M){return polyAdd(M.m[0][0],M.m[1][1]);}
+function mat2Eq(A,B){for(var i=0;i<2;i++)for(var j=0;j<2;j++)if(!polyEq(A.m[i][j],B.m[i][j]))return false;return true;}
+
+function mat2ToHTML(M,name){
+  var h='<div style="margin-bottom:0.75rem;">';
+  if(name)h+='<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;color:var(--accent-tl);margin-bottom:0.3rem;">'+name+'</div>';
+  h+='<table class="mat-table"><tr>';
+  h+='<td class="mat-bracket-left">'+polyToHTML(M.m[0][0])+'</td>';
+  h+='<td class="mat-bracket-right">'+polyToHTML(M.m[0][1])+'</td></tr><tr>';
+  h+='<td class="mat-bracket-left">'+polyToHTML(M.m[1][0])+'</td>';
+  h+='<td class="mat-bracket-right">'+polyToHTML(M.m[1][1])+'</td></tr></table></div>';
+  return h;
+}
+
+/* ============================================================
+ * GLOBAL CONSTANTS
+ * ============================================================ */
+var DELTA = polyAdd(Poly.mono(-1,2), Poly.mono(-1,-2));
+var W3_COEFF = polyAdd(Poly.mono(1,-4), Poly.mono(1,4)); /* quantum dim of W3 */
+
+/* TL generators on W1 */
+var U1 = new Mat2([[DELTA, Poly.mono(1,0)], [Poly.zero(), Poly.zero()]]);
+var U2 = new Mat2([[Poly.zero(), Poly.zero()], [Poly.mono(1,0), DELTA]]);
+
+/* Braid generators: g_i = A^{-1}*I + A*U_i */
+var G1 = mat2Add(mat2Scale(Mat2.identity(), Poly.mono(1,-1)), mat2Scale(U1, Poly.mono(1,1)));
+var G2 = mat2Add(mat2Scale(Mat2.identity(), Poly.mono(1,-1)), mat2Scale(U2, Poly.mono(1,1)));
+
+/* Inverses: g_i^{-1} = A*I + A^{-1}*U_i */
+var G1_INV = mat2Add(mat2Scale(Mat2.identity(), Poly.mono(1,1)), mat2Scale(U1, Poly.mono(1,-1)));
+var G2_INV = mat2Add(mat2Scale(Mat2.identity(), Poly.mono(1,1)), mat2Scale(U2, Poly.mono(1,-1)));
+
+/* ============================================================
+ * STATE-SUM ORACLE (from Demo 2)
+ * ============================================================ */
+function braidCountLoops(word,n,state){
+  var len=word.length,totalNodes=(len+1)*n,parent=[],i,l,p;
+  for(i=0;i<totalNodes;i++)parent[i]=i;
+  function find(x){while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;}
+  function union(x,y){x=find(x);y=find(y);if(x!==y)parent[x]=y;}
+  for(l=0;l<len;l++){var sign=word[l]>0?1:-1,gi=Math.abs(word[l])-1,bit=(state>>l)&1;
+    var cup=sign>0?(bit===0):(bit===1);
+    if(cup){union(l*n+gi,l*n+gi+1);union((l+1)*n+gi,(l+1)*n+gi+1);
+    for(p=0;p<n;p++)if(p!==gi&&p!==gi+1)union(l*n+p,(l+1)*n+p);}
+    else{for(p=0;p<n;p++)union(l*n+p,(l+1)*n+p);}}
+  for(p=0;p<n;p++)union(p,len*n+p);
+  var loops=0;for(i=0;i<totalNodes;i++)if(find(i)===i)loops++;return loops;}
+
+function braidBracketOracle(word,n){
+  var len=word.length,result=Poly.zero();
+  if(len===0){var r=Poly.mono(1,0);for(var i=0;i<n-1;i++)r=polyMul(r,DELTA);return r;}
+  var ns=1<<len;
+  for(var s=0;s<ns;s++){var ac=0,bc=0;
+    for(var i=0;i<len;i++){if((s>>i)&1)bc++;else ac++;}
+    var loops=braidCountLoops(word,n,s);
+    var term=Poly.mono(1,ac-bc),dp=Poly.mono(1,0);
+    for(var j=0;j<loops-1;j++)dp=polyMul(dp,DELTA);
+    result=polyAdd(result,polyMul(term,dp));}
+  return result;
+}
+
+/* ============================================================
+ * BRAID DEFINITIONS (3-strand only for TL₃)
+ * ============================================================ */
+var BRAIDS3 = {
+  'figure-eight': {
+    name: 'Figure-Eight 4₁',
+    word: [1,-2,1,-2], n: 3,
+    desc: 'Figure-eight: σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands. Writhe = 0. Amphichiral.'
+  },
+  'trefoil3': {
+    name: 'Trefoil (3-strand)',
+    word: [1,2,1], n: 3,
+    desc: 'Trefoil: σ₁σ₂σ₁ on 3 strands. Writhe = +3.'
+  },
+  'mirror3': {
+    name: 'Mirror Trefoil',
+    word: [-1,-2,-1], n: 3,
+    desc: 'Mirror trefoil: σ₁⁻¹σ₂⁻¹σ₁⁻¹ on 3 strands. Writhe = −3.'
+  },
+  'identity3': {
+    name: 'Identity (3-component unlink)',
+    word: [], n: 3,
+    desc: 'Empty braid on 3 strands. Closure = 3-component unlink. Bracket = δ².'
+  },
+  'single': {
+    name: 'Single crossing σ₁',
+    word: [1], n: 3,
+    desc: 'Single positive crossing σ₁ on 3 strands.'
+  }
+};
+
+/* Map braid word element to W1 matrix */
+function getW1Matrix(gen) {
+  if (gen === 1) return G1;
+  if (gen === -1) return G1_INV;
+  if (gen === 2) return G2;
+  if (gen === -2) return G2_INV;
+  return Mat2.identity();
+}
+
+/* Map braid word element to W3 scalar */
+function getW3Scalar(gen) {
+  /* On W3: U_i = 0, so g_i = A^{-1}, g_i^{-1} = A */
+  if (gen > 0) return Poly.mono(1, -1); /* A^{-1} */
+  return Poly.mono(1, 1); /* A */
+}
+
+function genLabel(g) {
+  var i = Math.abs(g);
+  return g > 0 ? 'g' + i : 'g' + i + '⁻¹';
+}
+
+function genLabelSigma(g) {
+  var i = Math.abs(g);
+  return g > 0 ? 'σ' + i : 'σ' + i + '⁻¹';
+}
+
+/* ============================================================
+ * EXPLANATORY FIGURES
+ * ============================================================ */
+function drawTLDiagrams() {
+  var c = document.getElementById('figTLDiagrams');
+  if (!c) return;
+  var ctx = c.getContext('2d'), w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+
+  var gap = 40, yTop = 50, yBot = 150;
+
+  function drawDots(x, g) {
+    for (var i = 0; i < 3; i++) {
+      ctx.fillStyle = '#6b7394';
+      ctx.beginPath(); ctx.arc(x + i*g, yTop, 3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + i*g, yBot, 3, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+
+  /* Identity */
+  var ix = 80;
+  drawDots(ix, gap);
+  ctx.strokeStyle = '#6b7394';
+  for (var i = 0; i < 3; i++) {
+    ctx.beginPath(); ctx.moveTo(ix+i*gap, yTop); ctx.lineTo(ix+i*gap, yBot); ctx.stroke();
+  }
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#6b7394'; ctx.textAlign = 'center';
+  ctx.fillText('Identity I', ix+gap, h-15);
+
+  /* U1 */
+  var ux = 280;
+  drawDots(ux, gap);
+  ctx.strokeStyle = '#e07070';
+  /* Cap on top (1-2) */
+  ctx.beginPath(); ctx.moveTo(ux, yTop); ctx.quadraticCurveTo(ux+gap/2, yTop+25, ux+gap, yTop); ctx.stroke();
+  /* Cup on bottom (1-2) */
+  ctx.beginPath(); ctx.moveTo(ux, yBot); ctx.quadraticCurveTo(ux+gap/2, yBot-25, ux+gap, yBot); ctx.stroke();
+  /* Through-line 3 */
+  ctx.strokeStyle = '#6b7394';
+  ctx.beginPath(); ctx.moveTo(ux+2*gap, yTop); ctx.lineTo(ux+2*gap, yBot); ctx.stroke();
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#e07070'; ctx.textAlign = 'center';
+  ctx.fillText('U₁', ux+gap, h-15);
+
+  /* U2 */
+  var vx = 490;
+  drawDots(vx, gap);
+  /* Through-line 1 */
+  ctx.strokeStyle = '#6b7394';
+  ctx.beginPath(); ctx.moveTo(vx, yTop); ctx.lineTo(vx, yBot); ctx.stroke();
+  /* Cap on top (2-3) */
+  ctx.strokeStyle = '#e07070';
+  ctx.beginPath(); ctx.moveTo(vx+gap, yTop); ctx.quadraticCurveTo(vx+1.5*gap, yTop+25, vx+2*gap, yTop); ctx.stroke();
+  /* Cup on bottom (2-3) */
+  ctx.beginPath(); ctx.moveTo(vx+gap, yBot); ctx.quadraticCurveTo(vx+1.5*gap, yBot-25, vx+2*gap, yBot); ctx.stroke();
+  ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#e07070'; ctx.textAlign = 'center';
+  ctx.fillText('U₂', vx+gap, h-15);
+}
+
+/* ============================================================
+ * BUILD UI
+ * ============================================================ */
+var currentBraid3 = 'figure-eight';
+
+function renderTLGenerators() {
+  var el = document.getElementById('tlGenerators');
+  el.innerHTML = mat2ToHTML(U1, 'U₁') + mat2ToHTML(U2, 'U₂');
+  el.innerHTML += '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.5rem;">δ = ' + polyToHTML(DELTA) + '</div>';
+}
+
+function renderBraidGenerators() {
+  var el = document.getElementById('braidGenerators');
+  el.innerHTML =
+    mat2ToHTML(G1, 'g₁ = A⁻¹·I + A·U₁') +
+    mat2ToHTML(G2, 'g₂ = A⁻¹·I + A·U₂') +
+    '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.5rem;">Inverses: g<sub>i</sub>⁻¹ = A·I + A⁻¹·U<sub>i</sub></div>';
+}
+
+function renderComputation() {
+  var braid = BRAIDS3[currentBraid3];
+  var word = braid.word;
+
+  /* Step-by-step W1 product */
+  var stepsEl = document.getElementById('stepsW1');
+  var steps = [];
+  var product = Mat2.identity();
+
+  if (word.length === 0) {
+    steps.push({label: 'identity', matrix: product, desc: 'I (no crossings)'});
+  } else {
+    steps.push({label: 'start', matrix: Mat2.identity(), desc: 'I'});
+    for (var i = 0; i < word.length; i++) {
+      var gi = getW1Matrix(word[i]);
+      product = mat2Mul(product, gi);
+      steps.push({
+        label: 'step ' + (i+1),
+        matrix: product,
+        desc: (i === 0 ? '' : '… × ') + genLabel(word[i])
+      });
+    }
+  }
+
+  var html = '';
+  for (var s = 0; s < steps.length; s++) {
+    var st = steps[s];
+    html += '<div style="margin-bottom:1rem;">';
+    html += '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.6rem;color:var(--accent-tl);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">' + st.label + ': ' + st.desc + '</div>';
+    html += mat2ToHTML(st.matrix, null);
+    html += '</div>';
+  }
+  stepsEl.innerHTML = html;
+
+  /* Trace of W1 product */
+  var trW1 = mat2Trace(product);
+  document.getElementById('traceW1').innerHTML = polyToHTML(trW1);
+
+  /* W3 trace: product of scalars */
+  var trW3 = Poly.mono(1, 0);
+  for (var i = 0; i < word.length; i++) {
+    trW3 = polyMul(trW3, getW3Scalar(word[i]));
+  }
+
+  /* Module decomposition */
+  document.getElementById('trW1Val').innerHTML = polyToHTML(trW1);
+  document.getElementById('trW3Val').innerHTML = polyToHTML(trW3);
+
+  var contribW1 = trW1; /* coefficient is 1 */
+  var contribW3 = polyMul(W3_COEFF, trW3);
+  document.getElementById('contribW1').innerHTML = polyToHTML(contribW1);
+  document.getElementById('contribW3').innerHTML = polyToHTML(contribW3);
+
+  var bracketModules = polyAdd(contribW1, contribW3);
+  document.getElementById('bracketModules').innerHTML = '⟨K⟩ = ' + polyToHTML(bracketModules);
+
+  /* Oracle */
+  var oracle = braidBracketOracle(word, braid.n);
+  document.getElementById('bracketOracle').innerHTML = '⟨K⟩ = ' + polyToHTML(oracle);
+
+  /* Verify */
+  var match = polyEq(bracketModules, oracle);
+  var badgeEl = document.getElementById('verifyBadge');
+  if (match) {
+    badgeEl.innerHTML = '<span class="verify-badge verify-pass">✓ Modules = Oracle — matrix trace matches state sum exactly</span>';
+  } else {
+    badgeEl.innerHTML = '<span class="verify-badge verify-fail">✗ Mismatch — something is wrong</span>';
+  }
+}
+
+function selectBraid3(name) {
+  currentBraid3 = name;
+  var braid = BRAIDS3[name];
+  document.querySelectorAll('.braid-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.braid === name);
+  });
+  document.getElementById('braidDesc').textContent = braid.desc;
+  renderComputation();
+}
+
+/* Init */
+document.querySelectorAll('.braid-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() { selectBraid3(this.dataset.braid); });
+});
+
+drawTLDiagrams();
+renderTLGenerators();
+renderBraidGenerators();
+selectBraid3('figure-eight');
+</script>
+</body>
+</html>
