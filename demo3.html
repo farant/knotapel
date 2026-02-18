@@ -4,163 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temperley-Lieb Modules & the Bracket — Demo 3</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="web-components.js"></script>
 <style>
-:root {
-  --bg: #0c0e13;
-  --surface: #14171e;
-  --surface2: #1a1e28;
-  --surface3: #1f2433;
-  --border: #2a2f3d;
-  --text: #d4d8e4;
-  --text-dim: #6b7394;
-  --text-bright: #eef0f6;
-  --accent-a: #5b9bd5;
-  --accent-b: #d4845a;
-  --accent-loop: #7bc77b;
-  --accent-poly: #c4a0e8;
-  --accent-braid: #e8c86a;
-  --accent-tl: #e07070;
-  --highlight: #f0d060;
-  --negative: #e06070;
-  --positive: #60c080;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg, #0c0e13);
-  background-color: #0c0e13;
-  color: var(--text, #d4d8e4);
-  font-family: 'Crimson Pro', Georgia, serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 25% 20%, rgba(224,112,112,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 75% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
-
-header { text-align: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-header h1 { font-weight: 300; font-size: 2.4rem; letter-spacing: 0.03em; color: var(--text-bright); margin-bottom: 0.3rem; }
-header h1 em { color: var(--accent-tl); font-style: italic; }
-header .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
-header .demo-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--accent-tl); border: 1px solid rgba(224,112,112,0.3); padding: 2px 8px; border-radius: 2px; margin-top: 0.5rem; letter-spacing: 0.1em; }
-
-.prose { margin-bottom: 2.5rem; }
-.prose h2 { font-weight: 400; font-size: 1.5rem; color: var(--text-bright); margin-bottom: 0.75rem; }
-.prose h2 .num { color: var(--accent-tl); font-style: italic; margin-right: 0.3rem; }
-.prose p { margin-bottom: 1rem; }
-.prose p.dim { color: var(--text-dim); font-style: italic; }
-.key-term { color: var(--accent-tl); font-weight: 500; }
-.key-term-poly { color: var(--accent-poly); font-weight: 500; }
-.key-term-braid { color: var(--accent-braid); font-weight: 500; }
-
-code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--surface2); padding: 1px 5px; border-radius: 2px; color: var(--accent-poly); }
-
-.recap-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent-braid); border-radius: 3px; padding: 1.25rem; margin-bottom: 2.5rem; }
-.recap-box .recap-title { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--accent-braid); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
-.recap-box p { margin-bottom: 0.75rem; font-size: 0.95rem; }
-.recap-box p:last-child { margin-bottom: 0; }
-
-.formula-box { background: var(--surface); border-left: 3px solid var(--accent-tl); padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; font-family: 'Crimson Pro', serif; font-size: 1.15rem; text-align: center; line-height: 1.9; }
-.formula-box .var-a { color: var(--accent-poly); font-style: italic; }
-.formula-box sup { font-size: 0.7em; }
-.formula-box .label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; text-align: left; }
-
-.step-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; margin: 1rem 0; }
-.step-box .step-num { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent-tl); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
-
-.figure { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1.25rem; margin: 1.25rem 0 1.5rem; text-align: center; }
-.figure canvas { display: block; margin: 0 auto; }
-.figure-caption { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); margin-top: 0.75rem; letter-spacing: 0.03em; line-height: 1.5; }
-
-.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; margin-bottom: 2.5rem; }
-.toc-title { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
-.toc a { display: block; color: var(--text-dim); text-decoration: none; font-size: 0.92rem; padding: 0.2rem 0; transition: color 0.2s; }
-.toc a:hover { color: var(--accent-tl); }
-.toc a .num { color: var(--accent-tl); font-style: italic; margin-right: 0.4rem; }
-
-.sep { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
-
-/* MATRIX DISPLAY */
-.mat-inline { display: inline-block; vertical-align: middle; margin: 0.5rem 0.3rem; }
-.mat-table { border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; margin: 0 auto; }
-.mat-table td { padding: 0.3rem 0.6rem; text-align: center; border: 1px solid var(--border); min-width: 60px; background: transparent; }
-.mat-table .mat-header { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; border: none; padding-bottom: 0.5rem; }
-.mat-bracket-left { border-left: 2px solid var(--accent-tl) !important; }
-.mat-bracket-right { border-right: 2px solid var(--accent-tl) !important; }
-
-/* INTERACTIVE TOOL */
-.tool-header { text-align: center; margin-bottom: 1.5rem; }
-.tool-header h2 { font-weight: 300; font-size: 1.6rem; color: var(--text-bright); margin-bottom: 0.3rem; }
-.tool-header .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.06em; }
-
-.braid-selector { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.braid-btn { font-family: 'Crimson Pro', serif; font-size: 1rem; padding: 0.55rem 1.3rem; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; border-radius: 2px; transition: all 0.25s ease; }
-.braid-btn:hover { border-color: var(--accent-tl); color: var(--text); }
-.braid-btn.active { background: var(--surface2); border-color: var(--accent-tl); color: var(--accent-tl); box-shadow: 0 0 12px rgba(224,112,112,0.1); }
-
-.braid-desc { text-align: center; font-size: 0.95rem; color: var(--text-dim); margin-bottom: 1.5rem; font-style: italic; min-height: 2.5em; }
-
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1.25rem; margin-bottom: 1.5rem; animation: fadeIn 0.4s ease both; }
-.panel-title { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-
-.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-@media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
-
-.full-width { grid-column: 1 / -1; }
-
-.polynomial-display { font-family: 'Crimson Pro', serif; font-size: 1.3rem; text-align: center; padding: 0.75rem 1rem; line-height: 1.8; word-break: break-word; }
-.polynomial-display .coeff-pos { color: var(--positive); }
-.polynomial-display .coeff-neg { color: var(--negative); }
-.polynomial-display .var-a { color: var(--accent-poly); font-style: italic; }
-.polynomial-display .sup { font-size: 0.8em; vertical-align: super; }
-
-.info-row { display: flex; gap: 2rem; justify-content: center; margin-top: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-dim); flex-wrap: wrap; }
-.info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
-.info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-.dot-tl { background: var(--accent-tl); }
-.dot-braid { background: var(--accent-braid); }
-.dot-poly { background: var(--accent-poly); }
-.dot-loop { background: var(--accent-loop); }
-
-/* Step-by-step multiplication */
-.step-display { margin: 1rem 0; }
-.step-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(42,47,61,0.5); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; transition: background 0.15s; }
-.step-item:hover { background: rgba(224,112,112,0.04); }
-.step-item.active-step { background: rgba(224,112,112,0.08); }
-.step-item .step-label { color: var(--accent-tl); min-width: 80px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; }
-.step-item .step-op { color: var(--text-dim); min-width: 30px; text-align: center; }
-
-/* Verify badge */
-.verify-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 2px; }
-.verify-pass { background: rgba(96,192,128,0.1); color: var(--positive); border: 1px solid rgba(96,192,128,0.2); }
-.verify-fail { background: rgba(224,96,112,0.1); color: var(--negative); border: 1px solid rgba(224,96,112,0.2); }
-
-/* Module cards */
-.module-cards { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.75rem; align-items: start; margin: 1rem 0; }
-.module-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1rem; }
-.module-card .module-name { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent-tl); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
-.module-plus { font-size: 1.5rem; color: var(--text-dim); align-self: center; padding-top: 1.5rem; }
-
-/* Accum controls */
-.accum-controls { display: flex; gap: 0.75rem; justify-content: center; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; }
-.accum-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.4rem 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; border-radius: 2px; transition: all 0.2s; }
-.accum-btn:hover { border-color: var(--accent-tl); color: var(--text); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  body { --accent: var(--accent-tl); }
+  body::before {
+    background:
+      radial-gradient(ellipse at 25% 20%, rgba(224,112,112,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 75% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  }
 </style>
 </head>
 <body>
@@ -199,12 +51,11 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
     <p>Behind every smoothing operation in the Kauffman bracket lies an algebraic structure. When we resolve a crossing as an A-smoothing, we are applying a specific operation to the strands: cupping two adjacent strands together (joining them with a cap on top and a cup on the bottom). The <span class="key-term">Temperley-Lieb algebra</span> TL<sub>n</sub> is the algebra generated by these cup-cap operations.</p>
     <p>For <em>n</em> strands, TL<sub>n</sub> has generators U₁, U₂, …, U<sub>n−1</sub>, where U<sub>i</sub> cups together strands <em>i</em> and <em>i</em>+1. These generators satisfy three fundamental relations:</p>
 
-    <div class="formula-box">
-      <span class="label">Temperley-Lieb relations</span>
+    <formula-box label="Temperley-Lieb relations">
       U<sub>i</sub>² = δ · U<sub>i</sub> &nbsp;&nbsp;&nbsp; (idempotent up to δ)<br>
       U<sub>i</sub> U<sub>j</sub> = U<sub>j</sub> U<sub>i</sub> &nbsp; when |<em>i</em>−<em>j</em>| ≥ 2 &nbsp;&nbsp;&nbsp; (far-apart generators commute)<br>
       U<sub>i</sub> U<sub>i±1</sub> U<sub>i</sub> = U<sub>i</sub> &nbsp;&nbsp;&nbsp; (the Jones relation)
-    </div>
+    </formula-box>
 
     <p>Here δ = −<em>A</em>² − <em>A</em>⁻² is the same loop value from the bracket. The first relation says: if you cup strands <em>i</em> and <em>i</em>+1, then cup them again, you get the same configuration but with an extra loop — and each loop is worth δ. The third relation is deeper: it says that cupping, then doing a neighbouring cup, then cupping again, just gives the original cup back. This "absorption" property is what makes the TL algebra finite-dimensional despite being generated by repeated compositions.</p>
   </div>
@@ -231,18 +82,16 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
 
     <p>For TL₃, the defect count must have the same parity as <em>n</em> = 3 (odd). So the modules are:</p>
 
-    <div class="step-box">
-      <div class="step-num">W₃ — the 1-dimensional module (3 defects)</div>
+    <step-box label="W₃ — the 1-dimensional module (3 defects)">
       <p>Basis: the single diagram with 3 through-lines (the identity). Since U<sub>i</sub> reduces through-lines by 2, and you cannot go from 3 to 1 defect within W₃, both U₁ and U₂ act as <strong>zero</strong>. This is the trivial module. Dimension = 1.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">W₁ — the 2-dimensional module (1 defect)</div>
+    <step-box label="W₁ — the 2-dimensional module (1 defect)">
       <p>Basis: diagrams with exactly 1 through-line and 1 cap. There are two such diagrams:<br>
       <strong>e<sub>a</sub></strong>: cap on positions 1-2, through-line at position 3.<br>
       <strong>e<sub>b</sub></strong>: cap on positions 2-3, through-line at position 1.<br>
       This is the interesting module where the TL algebra acts non-trivially. Dimension = 2.</p>
-    </div>
+    </step-box>
 
     <p>The dimensions follow from the ballot-number formula: dim(W<sub>k</sub>) = C(<em>n</em>, (<em>n</em>−<em>k</em>)/2) − C(<em>n</em>, (<em>n</em>−<em>k</em>)/2 − 1). For W₁: C(3,1) − C(3,0) = 3 − 1 = 2. For W₃: C(3,0) − C(3,−1) = 1 − 0 = 1.</p>
   </div>
@@ -252,12 +101,11 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
     <h2><span class="num">4.</span> Explicit matrices for TL₃</h2>
     <p>Working out the action of U₁ and U₂ on the basis {e<sub>a</sub>, e<sub>b</sub>} of W₁ by composing diagrams gives:</p>
 
-    <div class="formula-box">
-      <span class="label">TL₃ generators on W₁ (2×2 matrices)</span>
+    <formula-box label="TL₃ generators on W₁ (2×2 matrices)">
       U₁ = <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">[[δ, 1], [0, 0]]</span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       U₂ = <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">[[0, 0], [1, δ]]</span>
-    </div>
+    </formula-box>
 
     <p>These matrices encode how each generator transforms the basis diagrams. For instance, U₁ acting on e<sub>a</sub> (cap on 1-2, through at 3) gives δ · e<sub>a</sub> — the cap absorbs itself with a loop factor. U₁ acting on e<sub>b</sub> (cap on 2-3, through at 1) gives e<sub>a</sub> — the cup-cap at positions 1-2 reconnects the through-line.</p>
     <p>The C code verifies all four TL relations for these matrices: U₁² = δU₁, U₂² = δU₂, U₁U₂U₁ = U₁, and U₂U₁U₂ = U₂. All four pass.</p>
@@ -268,11 +116,10 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
     <h2><span class="num">5.</span> The braid representation</h2>
     <p>The Kauffman bracket resolves each crossing as <em>A</em> · (identity) + <em>A</em>⁻¹ · (cup-cap). In algebraic terms, the braid generator σ<sub>i</sub> maps to:</p>
 
-    <div class="formula-box">
-      <span class="label">Braid representation</span>
+    <formula-box label="Braid representation">
       ρ(σ<sub>i</sub>) = <span class="var-a">A</span>⁻¹ · I + <span class="var-a">A</span> · U<sub>i</sub><br>
       ρ(σ<sub>i</sub>⁻¹) = <span class="var-a">A</span> · I + <span class="var-a">A</span>⁻¹ · U<sub>i</sub>
-    </div>
+    </formula-box>
 
     <p>On W₁ these are 2×2 matrices with polynomial entries. On W₃ (where U<sub>i</sub> = 0), the positive generator becomes the scalar <em>A</em>⁻¹ and the negative generator becomes <em>A</em>.</p>
 
@@ -284,13 +131,12 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
     <h2><span class="num">6.</span> Inverses and the key cancellation</h2>
     <p>A natural worry: does ρ(σ<sub>i</sub>) have an inverse? If σ<sub>i</sub> and σ<sub>i</sub>⁻¹ are inverses in the braid group, their images should multiply to the identity. Let us check:</p>
 
-    <div class="formula-box">
-      <span class="label">The key cancellation</span>
+    <formula-box label="The key cancellation">
       ρ(σ<sub>i</sub>) · ρ(σ<sub>i</sub>⁻¹) = (<span class="var-a">A</span>⁻¹I + <span class="var-a">A</span>U)(<span class="var-a">A</span>I + <span class="var-a">A</span>⁻¹U)<br>
       = I + <span class="var-a">A</span>⁻²U + <span class="var-a">A</span>²U + U²<br>
       = I + (<span class="var-a">A</span>² + <span class="var-a">A</span>⁻² + δ) · U<br>
       = I + 0 · U = <strong>I</strong>
-    </div>
+    </formula-box>
 
     <p>The miraculous cancellation: <em>A</em>² + <em>A</em>⁻² + δ = <em>A</em>² + <em>A</em>⁻² + (−<em>A</em>² − <em>A</em>⁻²) = 0. This is not a coincidence — it is <em>why</em> δ has the value it does. The loop value δ = −<em>A</em>² − <em>A</em>⁻² is precisely the value that makes the braid representation well-defined (invertible). The C code verifies g₁ · g₁⁻¹ = I and g₂ · g₂⁻¹ = I.</p>
 
@@ -302,10 +148,9 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
     <h2><span class="num">7.</span> Full bracket via module decomposition</h2>
     <p>The bracket of a 3-strand braid closure is recovered by combining the traces from <em>both</em> modules W₁ and W₃, weighted by their <span class="key-term">quantum dimensions</span>:</p>
 
-    <div class="formula-box">
-      <span class="label">Module decomposition formula</span>
+    <formula-box label="Module decomposition formula">
       ⟨closure(b)⟩ = 1 · tr<sub>W₁</sub>(ρ(b)) + (<span class="var-a">A</span>⁻⁴ + <span class="var-a">A</span>⁴) · tr<sub>W₃</sub>(ρ(b))
-    </div>
+    </formula-box>
 
     <p>The coefficient 1 for W₁ and (<em>A</em>⁻⁴ + <em>A</em>⁴) for W₃ are the quantum dimensions of these modules. On W₃, since all U<sub>i</sub> = 0, the representation reduces to scalars: each positive crossing contributes <em>A</em>⁻¹ and each negative crossing contributes <em>A</em>. So the W₃ trace is simply <em>A</em><sup>−(#pos) + (#neg)</sup>.</p>
 
@@ -318,25 +163,21 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
   <div class="prose" id="sec-code">
     <h2><span class="num">8.</span> What the C code does</h2>
 
-    <div class="step-box">
-      <div class="step-num">Part A: TL relations</div>
+    <step-box label="Part A: TL relations">
       <p>Constructs the 2×2 matrices U₁ and U₂ for TL₃ and verifies all four defining relations: U₁² = δU₁, U₂² = δU₂, U₁U₂U₁ = U₁, U₂U₁U₂ = U₂.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Part B: Braid inverses</div>
+    <step-box label="Part B: Braid inverses">
       <p>Constructs g<sub>i</sub> = A⁻¹I + AU<sub>i</sub> and g<sub>i</sub>⁻¹ = AI + A⁻¹U<sub>i</sub>, then verifies g₁·g₁⁻¹ = I and g₂·g₂⁻¹ = I.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Part C: Yang-Baxter</div>
+    <step-box label="Part C: Yang-Baxter">
       <p>Verifies the braid relation g₁g₂g₁ = g₂g₁g₂ and the inverse version g₁⁻¹g₂⁻¹g₁⁻¹ = g₂⁻¹g₁⁻¹g₂⁻¹.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Part D: Full bracket via both modules</div>
+    <step-box label="Part D: Full bracket via both modules">
       <p>For each test braid, computes tr<sub>W₁</sub>(product) and tr<sub>W₃</sub>(product), combines them with quantum dimension weights, and compares against the state-sum oracle. All five tests pass.</p>
-    </div>
+    </step-box>
 
     <p class="dim">The interactive tool below implements the same 2×2 polynomial matrix arithmetic and module decomposition. The state-sum oracle is also computed for verification.</p>
   </div>
@@ -350,42 +191,38 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
       <div class="subtitle">Watch the matrix product build step by step, verify against the state-sum oracle</div>
     </div>
 
-    <div class="braid-selector" id="braidSelector">
-      <button class="braid-btn active" data-braid="figure-eight">Figure-Eight</button>
-      <button class="braid-btn" data-braid="trefoil3">Trefoil (3-strand)</button>
-      <button class="braid-btn" data-braid="mirror3">Mirror Trefoil</button>
-      <button class="braid-btn" data-braid="identity3">Identity (unlink)</button>
-      <button class="braid-btn" data-braid="single">Single σ₁</button>
-    </div>
+    <selector-bar value="figure-eight" id="braidSelector">
+      <button value="figure-eight">Figure-Eight</button>
+      <button value="trefoil3">Trefoil (3-strand)</button>
+      <button value="mirror3">Mirror Trefoil</button>
+      <button value="identity3">Identity (unlink)</button>
+      <button value="single">Single σ₁</button>
+    </selector-bar>
 
-    <div class="braid-desc" id="braidDesc">Figure-eight: σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands. Writhe = 0.</div>
+    <div class="selector-desc" id="braidDesc">Figure-eight: σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands. Writhe = 0.</div>
 
     <div class="main-grid">
       <!-- TL generators -->
-      <div class="panel">
-        <div class="panel-title">TL₃ generators on W₁ (2×2 over ℤ[A,A⁻¹])</div>
+      <panel-card panel-title="TL₃ generators on W₁ (2×2 over ℤ[A,A⁻¹])">
         <div id="tlGenerators"></div>
-      </div>
+      </panel-card>
 
       <!-- Braid generators -->
-      <div class="panel">
-        <div class="panel-title">Braid representation on W₁</div>
+      <panel-card panel-title="Braid representation on W₁">
         <div id="braidGenerators"></div>
-      </div>
+      </panel-card>
 
       <!-- Step-by-step multiplication on W1 -->
-      <div class="panel full-width">
-        <div class="panel-title">Matrix product on W₁: step-by-step</div>
+      <panel-card panel-title="Matrix product on W₁: step-by-step" class="full-width">
         <div id="stepsW1"></div>
         <div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:0.75rem;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Trace of product (W₁)</div>
           <div class="polynomial-display" id="traceW1" style="font-size:1.1rem;"></div>
         </div>
-      </div>
+      </panel-card>
 
       <!-- Module decomposition -->
-      <div class="panel full-width">
-        <div class="panel-title">Module decomposition: ⟨K⟩ = 1·tr(W₁) + (A⁻⁴+A⁴)·tr(W₃)</div>
+      <panel-card panel-title="Module decomposition: ⟨K⟩ = 1·tr(W₁) + (A⁻⁴+A⁴)·tr(W₃)" class="full-width">
         <div class="module-cards" id="moduleCards">
           <div class="module-card">
             <div class="module-name">W₁ (dim 2)</div>
@@ -420,47 +257,13 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: 
           <span><span class="dot dot-poly"></span> polynomial</span>
           <span><span class="dot dot-loop"></span> verified</span>
         </div>
-      </div>
+      </panel-card>
     </div>
   </div>
 
 </div>
 
 <script>
-/* ============================================================
- * POLYNOMIAL ARITHMETIC
- * ============================================================ */
-function Poly(c,lo){this.c=c?c.slice():[];this.lo=lo||0;}
-Poly.zero=function(){return new Poly([],0);};
-Poly.mono=function(coeff,exp){if(coeff===0)return Poly.zero();return new Poly([coeff],exp);};
-Poly.prototype.trim=function(){var a=0,b=this.c.length-1;while(a<=b&&this.c[a]===0)a++;
-  if(a>b){this.c=[];this.lo=0;return this;}while(b>a&&this.c[b]===0)b--;
-  this.c=this.c.slice(a,b+1);this.lo+=a;return this;};
-function polyAdd(a,b){if(!a.c.length)return new Poly(b.c,b.lo);if(!b.c.length)return new Poly(a.c,a.lo);
-  var lo=Math.min(a.lo,b.lo),hi=Math.max(a.lo+a.c.length-1,b.lo+b.c.length-1);
-  var c=new Array(hi-lo+1),i;for(i=0;i<c.length;i++)c[i]=0;
-  for(i=0;i<a.c.length;i++)c[a.lo+i-lo]+=a.c[i];for(i=0;i<b.c.length;i++)c[b.lo+i-lo]+=b.c[i];
-  return new Poly(c,lo).trim();}
-function polyMul(a,b){if(!a.c.length||!b.c.length)return Poly.zero();
-  var len=a.c.length+b.c.length-1,c=new Array(len),i,j;for(i=0;i<len;i++)c[i]=0;
-  for(i=0;i<a.c.length;i++)for(j=0;j<b.c.length;j++)c[i+j]+=a.c[i]*b.c[j];
-  return new Poly(c,a.lo+b.lo).trim();}
-function polyEq(a,b){if(a.c.length!==b.c.length)return false;if(!a.c.length)return true;
-  if(a.lo!==b.lo)return false;for(var i=0;i<a.c.length;i++)if(a.c[i]!==b.c[i])return false;return true;}
-function polyToHTML(p){if(!p.c.length)return'<span class="coeff-pos">0</span>';var parts=[];
-  for(var i=0;i<p.c.length;i++){if(p.c[i]===0)continue;var e=p.lo+i,coeff=p.c[i],s='';
-  if(parts.length>0)s+=coeff>0?' + ':' − ';else if(coeff<0)s+='−';
-  var ac=Math.abs(coeff),cls=coeff>0?'coeff-pos':'coeff-neg';
-  if(ac!==1||e===0)s+=ac;if(e===1)s+='<span class="var-a">A</span>';
-  else if(e===-1)s+='<span class="var-a">A</span><span class="sup">−1</span>';
-  else if(e!==0)s+='<span class="var-a">A</span><span class="sup">'+e+'</span>';
-  parts.push('<span class="'+cls+'">'+s+'</span>');}return parts.join('');}
-function polyToText(p){if(!p.c.length)return'0';var parts=[];
-  for(var i=0;i<p.c.length;i++){if(p.c[i]===0)continue;var e=p.lo+i,c=p.c[i],s='';
-  if(parts.length>0)s+=c>0?' + ':' - ';else if(c<0)s+='-';var ac=Math.abs(c);
-  if(ac!==1||e===0)s+=ac;if(e===1)s+='A';else if(e===-1)s+='A⁻¹';
-  else if(e>0)s+='A^'+e;else if(e<0)s+='A^('+e+')';parts.push(s);}return parts.join('');}
-
 /* ============================================================
  * 2x2 MATRIX OVER POLYNOMIAL RING
  * ============================================================ */
@@ -489,7 +292,7 @@ function mat2ToHTML(M,name){
 /* ============================================================
  * GLOBAL CONSTANTS
  * ============================================================ */
-var DELTA = polyAdd(Poly.mono(-1,2), Poly.mono(-1,-2));
+var DELTA = D_POLY;
 var W3_COEFF = polyAdd(Poly.mono(1,-4), Poly.mono(1,4)); /* quantum dim of W3 */
 
 /* TL generators on W1 */
@@ -742,16 +545,13 @@ function renderComputation() {
 function selectBraid3(name) {
   currentBraid3 = name;
   var braid = BRAIDS3[name];
-  document.querySelectorAll('.braid-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.braid === name);
-  });
   document.getElementById('braidDesc').textContent = braid.desc;
   renderComputation();
 }
 
-/* Init */
-document.querySelectorAll('.braid-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() { selectBraid3(this.dataset.braid); });
+/* Selector bar */
+document.querySelector('selector-bar').addEventListener('change', function(e) {
+  selectBraid3(e.detail.value);
 });
 
 drawTLDiagrams();

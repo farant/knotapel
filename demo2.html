@@ -4,666 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Braid Words & the Kauffman Bracket — Demo 2</title>
+<link rel="stylesheet" href="shared.css">
+<script src="web-components.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
-
-:root {
-  --bg: #0c0e13;
-  --surface: #14171e;
-  --surface2: #1a1e28;
-  --surface3: #1f2433;
-  --border: #2a2f3d;
-  --text: #d4d8e4;
-  --text-dim: #6b7394;
-  --text-bright: #eef0f6;
-  --accent-a: #5b9bd5;
-  --accent-b: #d4845a;
-  --accent-loop: #7bc77b;
-  --accent-poly: #c4a0e8;
-  --accent-braid: #e8c86a;
-  --highlight: #f0d060;
-  --negative: #e06070;
-  --positive: #60c080;
-  --link: #8bb8e0;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Crimson Pro', Georgia, serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 30% 15%, rgba(232,200,106,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 85%, rgba(196,160,232,0.03) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.container {
-  position: relative;
-  z-index: 1;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
-}
-
-/* HEADER */
-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-header h1 {
-  font-weight: 300;
-  font-size: 2.4rem;
-  letter-spacing: 0.03em;
-  color: var(--text-bright);
-  margin-bottom: 0.3rem;
-}
-
-header h1 em { color: var(--accent-braid); font-style: italic; }
-
-header .subtitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--text-dim);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-header .demo-tag {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--accent-braid);
-  border: 1px solid rgba(232,200,106,0.3);
-  padding: 2px 8px;
-  border-radius: 2px;
-  margin-top: 0.5rem;
-  letter-spacing: 0.1em;
-}
-
-/* PROSE */
-.prose { margin-bottom: 2.5rem; }
-
-.prose h2 {
-  font-weight: 400;
-  font-size: 1.5rem;
-  color: var(--text-bright);
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.01em;
-}
-
-.prose h2 .num { color: var(--accent-braid); font-style: italic; margin-right: 0.3rem; }
-
-.prose h3 {
-  font-weight: 500;
-  font-size: 1.1rem;
-  color: var(--text-bright);
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.prose p { margin-bottom: 1rem; color: var(--text); }
-.prose p.dim { color: var(--text-dim); font-style: italic; }
-
-.key-term { color: var(--accent-braid); font-weight: 500; }
-.key-term-poly { color: var(--accent-poly); font-weight: 500; }
-.color-a { color: var(--accent-a); }
-.color-b { color: var(--accent-b); }
-
-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85em;
-  background: var(--surface2);
-  padding: 1px 5px;
-  border-radius: 2px;
-  color: var(--accent-poly);
-}
-
-/* FIGURES */
-.figure {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1.25rem;
-  margin: 1.25rem 0 1.5rem;
-  text-align: center;
-}
-
-.figure canvas { display: block; margin: 0 auto; }
-
-.figure-caption {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  color: var(--text-dim);
-  margin-top: 0.75rem;
-  letter-spacing: 0.03em;
-  line-height: 1.5;
-}
-
-/* FORMULA BOX */
-.formula-box {
-  background: var(--surface);
-  border-left: 3px solid var(--accent-braid);
-  padding: 1rem 1.25rem;
-  margin: 1.25rem 0 1.5rem;
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.15rem;
-  text-align: center;
-  line-height: 1.9;
-}
-
-.formula-box .var-a { color: var(--accent-poly); font-style: italic; }
-.formula-box sup { font-size: 0.7em; }
-.formula-box .label {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-/* STEP CALLOUTS */
-.step-box {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1rem 1.25rem;
-  margin: 1rem 0;
-}
-
-.step-box .step-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--accent-braid);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.3rem;
-}
-
-/* RECAP BOX */
-.recap-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-poly);
-  border-radius: 3px;
-  padding: 1.25rem;
-  margin-bottom: 2.5rem;
-}
-
-.recap-box .recap-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  color: var(--accent-poly);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.6rem;
-}
-
-.recap-box p { margin-bottom: 0.75rem; color: var(--text); font-size: 0.95rem; }
-.recap-box p:last-child { margin-bottom: 0; }
-
-/* SEPARATOR */
-.sep { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
-
-/* TOC */
-.toc {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 2.5rem;
-}
-
-.toc-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.6rem;
-}
-
-.toc a {
-  display: block;
-  color: var(--text-dim);
-  text-decoration: none;
-  font-size: 0.92rem;
-  padding: 0.2rem 0;
-  transition: color 0.2s;
-}
-
-.toc a:hover { color: var(--accent-braid); }
-.toc a .num { color: var(--accent-braid); font-style: italic; margin-right: 0.4rem; }
-
-/* INTERACTIVE TOOL */
-.tool-header { text-align: center; margin-bottom: 1.5rem; }
-
-.tool-header h2 {
-  font-weight: 300;
-  font-size: 1.6rem;
-  color: var(--text-bright);
-  margin-bottom: 0.3rem;
-}
-
-.tool-header .subtitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  color: var(--text-dim);
-  letter-spacing: 0.06em;
-}
-
-/* Braid selector */
-.braid-selector {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.braid-btn {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1rem;
-  padding: 0.55rem 1.3rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.25s ease;
-  letter-spacing: 0.02em;
-}
-
-.braid-btn:hover { border-color: var(--accent-braid); color: var(--text); }
-
-.braid-btn.active {
-  background: var(--surface2);
-  border-color: var(--accent-braid);
-  color: var(--accent-braid);
-  box-shadow: 0 0 12px rgba(232,200,106,0.1);
-}
-
-.braid-desc {
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--text-dim);
-  margin-bottom: 1.5rem;
-  font-style: italic;
-  min-height: 2.5em;
-}
-
-.instructions {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  text-align: center;
-  margin-bottom: 1.25rem;
-  letter-spacing: 0.04em;
-}
-
-.instructions kbd {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  padding: 1px 5px;
-  border-radius: 2px;
-  font-size: 0.6rem;
-}
-
-/* Main layout */
-.main-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-@media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
-
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1.25rem;
-  animation: fadeIn 0.4s ease both;
-}
-
-.panel:nth-child(2) { animation-delay: 0.1s; }
-
-.panel-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-dim);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Braid word display */
-.braid-word-display {
-  text-align: center;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.braid-word {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.4rem;
-  color: var(--text-bright);
-  letter-spacing: 0.05em;
-}
-
-.braid-word .sigma { color: var(--accent-braid); }
-.braid-word .sigma-neg { color: var(--accent-b); }
-.braid-word sup { font-size: 0.65em; }
-.braid-word .sep-dot { color: var(--text-dim); margin: 0 0.15em; }
-
-/* Braid canvas */
-.braid-canvas-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 280px;
-}
-
-/* Crossing diagram for closure */
-.crossing-diagram {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  min-height: 120px;
-  align-items: center;
-}
-
-.crossing-box {
-  position: relative;
-  width: 100px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.crossing-box:hover { transform: scale(1.08); }
-.crossing-box canvas { width: 100%; height: 100px; }
-
-.crossing-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  text-align: center;
-  color: var(--text-dim);
-  margin-top: 4px;
-  letter-spacing: 0.05em;
-}
-
-.smoothing-type {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-align: center;
-  margin-top: 2px;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.smoothing-type.type-a { color: var(--accent-a); }
-.smoothing-type.type-b { color: var(--accent-b); }
-
-/* Loop canvas */
-.loop-canvas-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 180px;
-}
-
-/* State table */
-.state-table-wrap {
-  max-height: 420px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-.state-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-}
-
-.state-table th {
-  position: sticky;
-  top: 0;
-  background: var(--surface);
-  color: var(--text-dim);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.6rem;
-  padding: 0.5rem 0.4rem;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-
-.state-table td {
-  padding: 0.4rem 0.4rem;
-  border-bottom: 1px solid rgba(42,47,61,0.5);
-  vertical-align: middle;
-}
-
-.state-table tr { transition: background 0.15s; cursor: pointer; }
-.state-table tr:hover { background: rgba(232,200,106,0.04); }
-.state-table tr.active-state { background: rgba(232,200,106,0.08); }
-.state-table tr.active-state td { color: var(--accent-braid); }
-
-.state-bits { display: inline-flex; gap: 2px; }
-
-.bit {
-  display: inline-block;
-  width: 16px; height: 16px;
-  line-height: 16px;
-  text-align: center;
-  border-radius: 2px;
-  font-size: 0.6rem;
-  font-weight: 500;
-}
-
-.bit-a { background: rgba(91,155,213,0.15); color: var(--accent-a); }
-.bit-b { background: rgba(212,132,90,0.15); color: var(--accent-b); }
-
-.loops-badge {
-  display: inline-block;
-  background: rgba(123,199,123,0.12);
-  color: var(--accent-loop);
-  padding: 1px 6px;
-  border-radius: 2px;
-}
-
-/* Result panel */
-.result-panel { grid-column: 1 / -1; }
-
-.polynomial-display {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.3rem;
-  text-align: center;
-  padding: 0.75rem 1rem;
-  line-height: 1.8;
-  letter-spacing: 0.01em;
-  word-break: break-word;
-}
-
-.polynomial-display .coeff-pos { color: var(--positive); }
-.polynomial-display .coeff-neg { color: var(--negative); }
-.polynomial-display .var-a { color: var(--accent-poly); font-style: italic; }
-.polynomial-display .sup { font-size: 0.8em; vertical-align: super; }
-
-.info-row {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  margin-top: 0.5rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  flex-wrap: wrap;
-}
-
-.info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
-.info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-.dot-a { background: var(--accent-a); }
-.dot-b { background: var(--accent-b); }
-.dot-loop { background: var(--accent-loop); }
-.dot-poly { background: var(--accent-poly); }
-.dot-braid { background: var(--accent-braid); }
-
-/* Accumulation controls */
-.accum-controls {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  align-items: center;
-  margin: 1rem 0 0.5rem;
-  flex-wrap: wrap;
-}
-
-.accum-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  padding: 0.4rem 1rem;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.2s;
-  letter-spacing: 0.03em;
-}
-
-.accum-btn:hover { border-color: var(--accent-braid); color: var(--text); }
-.accum-btn.active-play { border-color: var(--accent-loop); color: var(--accent-loop); }
-
-.accum-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--text-dim);
-}
-
-.running-sum {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.1rem;
-  text-align: center;
-  padding: 0.5rem;
-  min-height: 2em;
-  color: var(--highlight);
-}
-
-.running-sum .coeff-pos { color: var(--positive); }
-.running-sum .coeff-neg { color: var(--negative); }
-.running-sum .var-a { color: var(--accent-poly); font-style: italic; }
-.running-sum .sup { font-size: 0.8em; vertical-align: super; }
-
-/* Comparison panel */
-.comparison-panel {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 0;
-  align-items: center;
-}
-
-.compare-side {
-  text-align: center;
-  padding: 1rem;
-}
-
-.compare-side .compare-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.5rem;
-}
-
-.compare-side .compare-poly {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.1rem;
-}
-
-.compare-equals {
-  font-size: 2rem;
-  color: var(--accent-loop);
-  padding: 0 1rem;
-}
-
-.compare-neq {
-  font-size: 2rem;
-  color: var(--negative);
-  padding: 0 1rem;
-}
-
-/* Matrix display */
-.matrix-display {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  text-align: center;
-  padding: 0.75rem;
-  line-height: 2;
-}
-
-.matrix-display .mat-row {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.matrix-display .mat-entry {
-  min-width: 60px;
-  text-align: center;
-}
-
-/* Chirality display */
-.chirality-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 1rem;
-  align-items: center;
-  margin: 1rem 0;
-}
-
-.chirality-item {
-  text-align: center;
-  padding: 0.75rem;
-  background: var(--surface2);
-  border-radius: 3px;
-}
-
-.chirality-arrow {
-  font-size: 1.5rem;
-  color: var(--text-dim);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  body { --accent: var(--accent-braid); }
+  body::before {
+    background:
+      radial-gradient(ellipse at 30% 15%, rgba(232,200,106,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 85%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  }
 </style>
 </head>
 <body>
@@ -734,12 +83,11 @@ code {
 
     <p>Where Demo 1 used PD notation (lists of arc labels at each crossing), Demo 2 uses <span class="key-term">braid words</span>: a sequence of integers, where +<em>i</em> means "strand <em>i</em> crosses over strand <em>i</em>+1" (σ<sub>i</sub>) and −<em>i</em> means the reverse (σ<sub>i</sub>⁻¹).</p>
 
-    <div class="formula-box">
-      <span class="label">Braid word notation</span>
+    <formula-box label="Braid word notation">
       Trefoil &nbsp;=&nbsp; [+1, +1, +1] on 2 strands &nbsp;→&nbsp; σ₁³<br>
       Figure-eight &nbsp;=&nbsp; [+1, −2, +1, −2] on 3 strands &nbsp;→&nbsp; σ₁ σ₂⁻¹ σ₁ σ₂⁻¹<br>
       Hopf link &nbsp;=&nbsp; [+1, +1] on 2 strands &nbsp;→&nbsp; σ₁²
-    </div>
+    </formula-box>
 
     <p>This is more compact than PD notation — the trefoil needs just three numbers instead of twelve arc labels. The tradeoff is that the topological structure (which arcs connect where) is implicit rather than explicit. We recover it by tracking how strands weave through the crossings.</p>
 
@@ -754,15 +102,13 @@ code {
 
     <p>The only subtlety is what "A-smoothing" and "B-smoothing" <em>look like</em> on a braid. For a <strong>positive crossing</strong> σ<sub>i</sub>:</p>
 
-    <div class="step-box">
-      <div class="step-num">A-smoothing (horizontal join)</div>
+    <step-box label="A-smoothing (horizontal join)">
       <p>The two strands at positions <em>i</em> and <em>i</em>+1 get <em>cupped</em> together — they join at both the top and bottom of the crossing, forming two caps. The strands no longer continue through; they turn back. This is the "cup-cap" resolution.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">B-smoothing (straight through)</div>
+    <step-box label="B-smoothing (straight through)">
       <p>The two strands simply pass straight through — no crossing, no joining. Each strand continues from its top position directly to the corresponding bottom position.</p>
-    </div>
+    </step-box>
 
     <p>For a <strong>negative crossing</strong> σ<sub>i</sub>⁻¹, the smoothings are swapped: the A-smoothing goes straight, and the B-smoothing cups.</p>
 
@@ -782,10 +128,9 @@ code {
 
     <p>Think of the braid as a stack of levels. Between each pair of adjacent levels sits one crossing. At each level, there are <em>n</em> positions (one per strand). We create a node for every (level, position) pair — giving us (<em>c</em>+1) × <em>n</em> nodes total.</p>
 
-    <div class="step-box">
-      <div class="step-num">Connection rules</div>
+    <step-box label="Connection rules">
       <p>At each crossing, depending on the resolution: if <strong>straight</strong>, connect node(level, <em>p</em>) to node(level+1, <em>p</em>) for all positions. If <strong>cup</strong>, join positions <em>i</em> and <em>i</em>+1 at both the top and bottom of the crossing, and pass all other strands straight through. Finally, the closure arcs connect node(0, <em>k</em>) to node(<em>c</em>, <em>k</em>) for each strand.</p>
-    </div>
+    </step-box>
 
     <p>Union-find is a classic data structure for tracking connected components. We start with every node in its own component. As we process each crossing and the closure arcs, we merge components. At the end, the number of remaining distinct components is exactly the loop count. This gives us the same information as Demo 1's arc-tracing algorithm, just organized differently to suit the braid structure.</p>
   </div>
@@ -814,12 +159,11 @@ code {
 
     <p>For the simplest case — 2 strands — the representation is 1-dimensional (a scalar). Each positive crossing maps to:</p>
 
-    <div class="formula-box">
-      <span class="label">Braid representation (2-strand, 1D)</span>
+    <formula-box label="Braid representation (2-strand, 1D)">
       ρ(σ₁) &nbsp;=&nbsp; <span class="var-a">A</span> + <span class="var-a">A</span><sup>−1</sup> · δ
       &nbsp;=&nbsp; <span class="var-a">A</span> + <span class="var-a">A</span><sup>−1</sup>(−<span class="var-a">A</span><sup>2</sup> − <span class="var-a">A</span><sup>−2</sup>)
       &nbsp;=&nbsp; −<span class="var-a">A</span><sup>−3</sup>
-    </div>
+    </formula-box>
 
     <p>And each negative crossing maps to ρ(σ₁⁻¹) = −<em>A</em>³. Notice the mirror symmetry: positive and negative crossings give expressions related by <em>A</em> ↔ <em>A</em>⁻¹. This is the algebraic heart of chirality.</p>
 
@@ -830,30 +174,25 @@ code {
   <div class="prose" id="sec-code">
     <h2><span class="num">8.</span> What the C code does</h2>
 
-    <div class="step-box">
-      <div class="step-num">Laurent polynomials (reused from Demo 1)</div>
+    <step-box label="Laurent polynomials (reused from Demo 1)">
       <p>The same <code>Poly</code> type from Demo 1 — arrays of integer coefficients with a lowest exponent — is reused identically. Addition and multiplication follow standard polynomial algebra with negative exponents.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Braid words</div>
+    <step-box label="Braid words">
       <p>A <code>Braid</code> stores the number of strands, the length, and an array of signed integers (the braid word). Positive means σ<sub>i</sub>, negative means σ<sub>i</sub>⁻¹. Five test braids are hard-coded: the right-handed trefoil (σ₁³ on 2 strands), the left-handed trefoil (σ₁⁻³), the figure-eight (σ₁σ₂⁻¹σ₁σ₂⁻¹ on 3 strands), the Hopf link (σ₁²), and the trefoil on 3 strands (σ₁σ₂σ₁).</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Union-find loop counting</div>
+    <step-box label="Union-find loop counting">
       <p>For a given braid and resolution state, the code creates (len+1) × n nodes. Each crossing either passes strands straight through or cups positions <em>i</em> and <em>i</em>+1 (depending on the smoothing and the crossing sign). Closure arcs are added. Connected components are counted — that is the loop count.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">State sum and verification</div>
+    <step-box label="State sum and verification">
       <p>The bracket is computed by the same state sum as Demo 1, just applied to the braid closure. Results are verified against Demo 1's known values: the trefoil, figure-eight, and Hopf link brackets all match exactly. Additionally, the code verifies chirality (the right-handed and left-handed trefoil have mirror brackets) and palindromicity (the figure-eight bracket).</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Matrix proof of concept</div>
+    <step-box label="Matrix proof of concept">
       <p>For 2-strand braids, the code computes ρ(σ₁) = <em>A</em> + <em>A</em>⁻¹δ = −<em>A</em>⁻³ and ρ(σ₁⁻¹) = −<em>A</em>³, verifying the representation algebraically. This is the seed for Demo 3's full matrix trace approach.</p>
-    </div>
+    </step-box>
 
     <p class="dim">The interactive tool below is a direct JavaScript port of this C code — the same union-find loop counting, the same polynomial arithmetic, the same braid definitions. Results match exactly.</p>
   </div>
@@ -867,15 +206,15 @@ code {
       <div class="subtitle">Choose a braid, toggle smoothings, verify against Demo 1</div>
     </div>
 
-    <div class="braid-selector" id="braidSelector">
-      <button class="braid-btn active" data-braid="trefoil">Trefoil σ₁³</button>
-      <button class="braid-btn" data-braid="trefoil-left">Mirror Trefoil σ₁⁻³</button>
-      <button class="braid-btn" data-braid="figure-eight">Figure-Eight</button>
-      <button class="braid-btn" data-braid="hopf">Hopf Link σ₁²</button>
-      <button class="braid-btn" data-braid="unknot">Unknot</button>
-    </div>
+    <selector-bar value="trefoil" id="braidSelector">
+      <button value="trefoil">Trefoil σ₁³</button>
+      <button value="trefoil-left">Mirror Trefoil σ₁⁻³</button>
+      <button value="figure-eight">Figure-Eight</button>
+      <button value="hopf">Hopf Link σ₁²</button>
+      <button value="unknot">Unknot</button>
+    </selector-bar>
 
-    <div class="braid-desc" id="braidDesc">Right-handed trefoil: σ₁³ on 2 strands. Writhe = +3.</div>
+    <div class="selector-desc" id="braidDesc">Right-handed trefoil: σ₁³ on 2 strands. Writhe = +3.</div>
 
     <div class="instructions">
       Click crossings to toggle <kbd>A</kbd> ↔ <kbd>B</kbd> smoothing. Click state table rows to jump to states. Compare brackets with Demo 1 results.
@@ -883,52 +222,31 @@ code {
 
     <div class="main-grid">
       <!-- Left: braid diagram + smoothings -->
-      <div class="panel">
-        <div class="panel-title">Braid word &amp; diagram</div>
+      <panel-card panel-title="Braid word &amp; diagram">
         <div class="braid-word-display" id="braidWordDisplay"></div>
         <div class="braid-canvas-wrap">
           <canvas id="braidCanvas" width="360" height="280"></canvas>
         </div>
         <div style="margin-top:1rem;">
-          <div class="panel-title">Crossings — click to toggle smoothing</div>
+          <div class="kn-panel-title">Crossings — click to toggle smoothing</div>
           <div class="crossing-diagram" id="crossingDiagram"></div>
         </div>
         <div style="margin-top:1.25rem;">
-          <div class="panel-title">Resulting loops for this state</div>
+          <div class="kn-panel-title">Resulting loops for this state</div>
           <div class="loop-canvas-wrap">
             <canvas id="loopCanvas" width="360" height="180"></canvas>
           </div>
         </div>
-      </div>
+      </panel-card>
 
       <!-- Right: state table -->
-      <div class="panel">
-        <div class="panel-title">All 2<sup style="font-size:0.5rem">c</sup> states — contributions to ⟨K⟩</div>
-        <div class="state-table-wrap">
-          <table class="state-table" id="stateTable">
-            <thead><tr>
-              <th>#</th>
-              <th>Smoothings</th>
-              <th>Loops</th>
-              <th>Weight</th>
-              <th>Contribution</th>
-            </tr></thead>
-            <tbody id="stateBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <panel-card panel-title="All 2&lt;sup&gt;c&lt;/sup&gt; states — contributions to ⟨K⟩">
+        <state-table id="stateTable"></state-table>
+      </panel-card>
 
       <!-- Bottom: results -->
-      <div class="panel result-panel">
-        <div class="panel-title">Results</div>
-
-        <div class="accum-controls">
-          <button class="accum-btn" id="btnReset" title="Reset to state 0">⟲ Reset</button>
-          <button class="accum-btn" id="btnPrev" title="Previous state">◂ Prev</button>
-          <button class="accum-btn" id="btnNext" title="Next state">Next ▸</button>
-          <button class="accum-btn" id="btnPlay" title="Auto-play through states">▶ Play</button>
-          <span class="accum-label" id="accumLabel">State 0 / 7</span>
-        </div>
+      <panel-card panel-title="Results" class="full-width">
+        <accum-controls id="accumControls" current="0" total="7"></accum-controls>
         <div class="running-sum" id="runningSum"></div>
 
         <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
@@ -953,93 +271,13 @@ code {
           <span><span class="dot dot-loop"></span> loops</span>
           <span><span class="dot dot-poly"></span> bracket</span>
         </div>
-      </div>
+      </panel-card>
     </div>
   </div>
 
 </div>
 
 <script>
-/* ============================================================
- * POLYNOMIAL ARITHMETIC (same as Demo 1)
- * ============================================================ */
-function Poly(c, lo) { this.c = c ? c.slice() : []; this.lo = lo || 0; }
-Poly.zero = function() { return new Poly([], 0); };
-Poly.mono = function(coeff, exp) {
-  if (coeff === 0) return Poly.zero();
-  return new Poly([coeff], exp);
-};
-Poly.prototype.trim = function() {
-  var a = 0, b = this.c.length - 1;
-  while (a <= b && this.c[a] === 0) a++;
-  if (a > b) { this.c = []; this.lo = 0; return this; }
-  while (b > a && this.c[b] === 0) b--;
-  this.c = this.c.slice(a, b + 1);
-  this.lo += a;
-  return this;
-};
-function polyAdd(a, b) {
-  if (!a.c.length) return new Poly(b.c, b.lo);
-  if (!b.c.length) return new Poly(a.c, a.lo);
-  var lo = Math.min(a.lo, b.lo);
-  var hi = Math.max(a.lo+a.c.length-1, b.lo+b.c.length-1);
-  var c = new Array(hi-lo+1); var i;
-  for (i=0;i<c.length;i++) c[i]=0;
-  for (i=0;i<a.c.length;i++) c[a.lo+i-lo]+=a.c[i];
-  for (i=0;i<b.c.length;i++) c[b.lo+i-lo]+=b.c[i];
-  return new Poly(c,lo).trim();
-}
-function polyMul(a, b) {
-  if (!a.c.length||!b.c.length) return Poly.zero();
-  var len=a.c.length+b.c.length-1;
-  var c=new Array(len); var i,j;
-  for(i=0;i<len;i++) c[i]=0;
-  for(i=0;i<a.c.length;i++) for(j=0;j<b.c.length;j++) c[i+j]+=a.c[i]*b.c[j];
-  return new Poly(c,a.lo+b.lo).trim();
-}
-function polyEq(a,b) {
-  if(a.c.length!==b.c.length) return false;
-  if(!a.c.length) return true;
-  if(a.lo!==b.lo) return false;
-  for(var i=0;i<a.c.length;i++) if(a.c[i]!==b.c[i]) return false;
-  return true;
-}
-function polyToHTML(p) {
-  if (!p.c.length) return '<span class="coeff-pos">0</span>';
-  var parts = [];
-  for (var i=0;i<p.c.length;i++) {
-    if (p.c[i]===0) continue;
-    var e=p.lo+i, coeff=p.c[i], s='';
-    if (parts.length>0) s += coeff>0 ? ' + ' : ' − ';
-    else if (coeff<0) s += '−';
-    var ac=Math.abs(coeff);
-    var cls = coeff>0 ? 'coeff-pos' : 'coeff-neg';
-    if (parts.length>0) cls = coeff>0?'coeff-pos':'coeff-neg';
-    if (ac!==1||e===0) s+=ac;
-    if (e===1) s+='<span class="var-a">A</span>';
-    else if (e===-1) s+='<span class="var-a">A</span><span class="sup">−1</span>';
-    else if (e!==0) s+='<span class="var-a">A</span><span class="sup">'+e+'</span>';
-    parts.push('<span class="'+cls+'">'+s+'</span>');
-  }
-  return parts.join('');
-}
-
-/* Mirror a polynomial: A -> A^{-1} */
-function polyMirror(p) {
-  if (!p.c.length) return Poly.zero();
-  var c = p.c.slice().reverse();
-  var lo = -(p.lo + p.c.length - 1);
-  return new Poly(c, lo).trim();
-}
-
-function polyIsPalindromic(p) {
-  if (!p.c.length) return true;
-  for (var i = 0; i < Math.floor(p.c.length/2); i++)
-    if (p.c[i] !== p.c[p.c.length-1-i]) return false;
-  /* Also check if lo is symmetric: lo + hi = 0 */
-  return (p.lo + p.lo + p.c.length - 1) === 0;
-}
-
 /* ============================================================
  * BRAID DEFINITIONS
  * ============================================================ */
@@ -1172,8 +410,6 @@ function braidCountLoops(braid, state) {
 /* ============================================================
  * BRACKET COMPUTATION
  * ============================================================ */
-var D_POLY = polyAdd(Poly.mono(-1, 2), Poly.mono(-1, -2));
-
 function braidBracket(braid) {
   var result = Poly.zero();
   var len = braid.word.length;
@@ -1666,52 +902,9 @@ function buildCrossingDiagram() {
 function buildStateTable() {
   var braid = BRAIDS[currentBraid];
   cachedResult = braidBracket(braid);
-  var states = cachedResult.states;
-  var tbody = document.getElementById('stateBody');
-  tbody.innerHTML = '';
-  var cs = currentState();
-
-  for (var s = 0; s < states.length; s++) {
-    var st = states[s], tr = document.createElement('tr');
-    if (st.index === cs) tr.className = 'active-state';
-
-    var td0 = document.createElement('td');
-    td0.textContent = '#' + st.index; td0.style.color = 'var(--text-dim)';
-    tr.appendChild(td0);
-
-    var td1 = document.createElement('td');
-    var bits = document.createElement('span'); bits.className = 'state-bits';
-    for (var b = 0; b < braid.word.length; b++) {
-      var bit = document.createElement('span');
-      bit.className = 'bit ' + (((st.index >> b) & 1) ? 'bit-b' : 'bit-a');
-      bit.textContent = ((st.index >> b) & 1) ? 'B' : 'A';
-      bits.appendChild(bit);
-    }
-    td1.appendChild(bits); tr.appendChild(td1);
-
-    var td2 = document.createElement('td');
-    var badge = document.createElement('span'); badge.className = 'loops-badge';
-    badge.textContent = st.loops;
-    td2.appendChild(badge); tr.appendChild(td2);
-
-    var td3 = document.createElement('td');
-    td3.innerHTML = 'A<sup style="font-size:0.6rem">' + st.weightExp + '</sup>·d<sup style="font-size:0.6rem">' + (st.loops - 1) + '</sup>';
-    tr.appendChild(td3);
-
-    var td4 = document.createElement('td');
-    td4.innerHTML = polyToHTML(st.contribution);
-    td4.style.fontSize = '0.68rem';
-    tr.appendChild(td4);
-
-    tr.addEventListener('click', (function(idx, nn) {
-      return function() {
-        for (var b = 0; b < nn; b++) smoothings[b] = (idx >> b) & 1;
-        accumStep = idx;
-        updateAll();
-      };
-    })(st.index, braid.word.length));
-    tbody.appendChild(tr);
-  }
+  var st = document.getElementById('stateTable');
+  st.data = {crossingCount: braid.word.length, states: cachedResult.states};
+  st.activeState = currentState();
 }
 
 function updateAll() {
@@ -1727,8 +920,7 @@ function updateAll() {
   drawLoops(braid, currentState());
   drawBraidDiagram();
 
-  var rows = document.querySelectorAll('#stateBody tr'), cs = currentState();
-  for (var r = 0; r < rows.length; r++) rows[r].className = (r === cs) ? 'active-state' : '';
+  document.getElementById('stateTable').activeState = currentState();
 
   updateAccumDisplay();
 }
@@ -1736,8 +928,9 @@ function updateAll() {
 function updateAccumDisplay() {
   var braid = BRAIDS[currentBraid];
   var ns = braid.word.length === 0 ? 1 : (1 << braid.word.length);
-  var label = document.getElementById('accumLabel');
-  label.textContent = 'State ' + accumStep + ' / ' + (ns - 1);
+  var accumEl = document.getElementById('accumControls');
+  accumEl.setAttribute('current', accumStep);
+  accumEl.setAttribute('total', ns - 1);
 
   var running = Poly.zero();
   for (var i = 0; i <= accumStep && i < cachedResult.states.length; i++) {
@@ -1818,10 +1011,10 @@ function renderResult() {
 }
 
 function selectBraid(name) {
+  var accumEl = document.getElementById('accumControls');
   if (playInterval) {
     clearInterval(playInterval); playInterval = null;
-    document.getElementById('btnPlay').classList.remove('active-play');
-    document.getElementById('btnPlay').textContent = '▶ Play';
+    accumEl.playing = false;
   }
   currentBraid = name;
   var braid = BRAIDS[name];
@@ -1829,9 +1022,6 @@ function selectBraid(name) {
   for (var i = 0; i < braid.word.length; i++) smoothings.push(0);
   accumStep = 0;
 
-  document.querySelectorAll('.braid-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.braid === name);
-  });
   document.getElementById('braidDesc').textContent = braid.desc;
   document.getElementById('braidWordDisplay').innerHTML =
     '<span class="braid-word">' + braidWordToHTML(braid) + '</span>' +
@@ -1846,14 +1036,28 @@ function selectBraid(name) {
   updateAll();
 }
 
+/* Selector bar */
+document.querySelector('selector-bar').addEventListener('change', function(e) {
+  selectBraid(e.detail.value);
+});
+
+/* State table row clicks */
+document.getElementById('stateTable').addEventListener('state-select', function(e) {
+  var idx = e.detail.index;
+  var braid = BRAIDS[currentBraid];
+  for (var b = 0; b < braid.word.length; b++) smoothings[b] = (idx >> b) & 1;
+  accumStep = idx;
+  updateAll();
+});
+
 /* Accumulation controls */
-document.getElementById('btnReset').addEventListener('click', function() {
+var accumEl = document.getElementById('accumControls');
+accumEl.addEventListener('accum-reset', function() {
   accumStep = 0;
   for (var i = 0; i < smoothings.length; i++) smoothings[i] = 0;
   updateAll();
 });
-
-document.getElementById('btnPrev').addEventListener('click', function() {
+accumEl.addEventListener('accum-prev', function() {
   if (accumStep > 0) {
     accumStep--;
     var braid = BRAIDS[currentBraid];
@@ -1861,8 +1065,7 @@ document.getElementById('btnPrev').addEventListener('click', function() {
     updateAll();
   }
 });
-
-document.getElementById('btnNext').addEventListener('click', function() {
+accumEl.addEventListener('accum-next', function() {
   var ns = BRAIDS[currentBraid].word.length === 0 ? 1 : (1 << BRAIDS[currentBraid].word.length);
   if (accumStep < ns - 1) {
     accumStep++;
@@ -1871,23 +1074,15 @@ document.getElementById('btnNext').addEventListener('click', function() {
     updateAll();
   }
 });
-
-document.getElementById('btnPlay').addEventListener('click', function() {
-  var btn = this;
-  if (playInterval) {
-    clearInterval(playInterval); playInterval = null;
-    btn.classList.remove('active-play'); btn.textContent = '▶ Play';
-    return;
-  }
+accumEl.addEventListener('accum-play', function() {
   var ns = BRAIDS[currentBraid].word.length === 0 ? 1 : (1 << BRAIDS[currentBraid].word.length);
   accumStep = 0;
   for (var i = 0; i < smoothings.length; i++) smoothings[i] = 0;
   updateAll();
-  btn.classList.add('active-play'); btn.textContent = '⏸ Pause';
   playInterval = setInterval(function() {
     if (accumStep >= ns - 1) {
       clearInterval(playInterval); playInterval = null;
-      btn.classList.remove('active-play'); btn.textContent = '▶ Play';
+      accumEl.playing = false;
       return;
     }
     accumStep++;
@@ -1896,10 +1091,8 @@ document.getElementById('btnPlay').addEventListener('click', function() {
     updateAll();
   }, 800);
 });
-
-/* Braid buttons */
-document.querySelectorAll('.braid-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() { selectBraid(this.dataset.braid); });
+accumEl.addEventListener('accum-pause', function() {
+  if (playInterval) { clearInterval(playInterval); playInterval = null; }
 });
 
 /* Init */

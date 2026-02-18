@@ -4,554 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kauffman Bracket Explorer — An Introduction</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
-
-  :root {
-    --bg: #0c0e13;
-    --surface: #14171e;
-    --surface2: #1a1e28;
-    --surface3: #1f2433;
-    --border: #2a2f3d;
-    --text: #d4d8e4;
-    --text-dim: #6b7394;
-    --text-bright: #eef0f6;
-    --accent-a: #5b9bd5;
-    --accent-b: #d4845a;
-    --accent-loop: #7bc77b;
-    --accent-poly: #c4a0e8;
-    --highlight: #f0d060;
-    --negative: #e06070;
-    --positive: #60c080;
-    --link: #8bb8e0;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Crimson Pro', Georgia, serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    font-size: 17px;
-    line-height: 1.7;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 20%, rgba(91,155,213,0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 4rem;
-  }
-
-  /* ---- HEADER ---- */
-  header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  header h1 {
-    font-weight: 300;
-    font-size: 2.4rem;
-    letter-spacing: 0.03em;
-    color: var(--text-bright);
-    margin-bottom: 0.3rem;
-  }
-
-  header h1 em {
-    color: var(--accent-poly);
-    font-style: italic;
-  }
-
-  header .subtitle {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  /* ---- PROSE SECTIONS ---- */
-  .prose {
-    margin-bottom: 2.5rem;
-  }
-
-  .prose h2 {
-    font-weight: 400;
-    font-size: 1.5rem;
-    color: var(--text-bright);
-    margin-bottom: 0.75rem;
-    letter-spacing: 0.01em;
-  }
-
-  .prose h2 .num {
-    color: var(--accent-poly);
-    font-style: italic;
-    margin-right: 0.3rem;
-  }
-
-  .prose h3 {
-    font-weight: 500;
-    font-size: 1.1rem;
-    color: var(--text-bright);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .prose p {
-    margin-bottom: 1rem;
-    color: var(--text);
-  }
-
-  .prose p.dim {
-    color: var(--text-dim);
-    font-style: italic;
-  }
-
-  .key-term {
-    color: var(--accent-poly);
-    font-weight: 500;
-  }
-
-  .color-a { color: var(--accent-a); }
-  .color-b { color: var(--accent-b); }
-  .color-loop { color: var(--accent-loop); }
-
-  /* ---- FIGURES (inline diagrams) ---- */
-  .figure {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1.25rem;
-    margin: 1.25rem 0 1.5rem;
-    text-align: center;
-  }
-
-  .figure canvas {
-    display: block;
-    margin: 0 auto;
-  }
-
-  .figure-caption {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--text-dim);
-    margin-top: 0.75rem;
-    letter-spacing: 0.03em;
-    line-height: 1.5;
-  }
-
-  /* ---- FORMULA BOXES ---- */
-  .formula-box {
-    background: var(--surface);
-    border-left: 3px solid var(--accent-poly);
-    padding: 1rem 1.25rem;
-    margin: 1.25rem 0 1.5rem;
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.15rem;
-    text-align: center;
-    line-height: 1.9;
-  }
-
-  .formula-box .var-a { color: var(--accent-poly); font-style: italic; }
-  .formula-box sup { font-size: 0.7em; }
-  .formula-box .label {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-    text-align: left;
-  }
-
-  /* ---- STEP CALLOUTS ---- */
-  .step-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1rem 1.25rem;
-    margin: 1rem 0;
-  }
-
-  .step-box .step-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--accent-poly);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.3rem;
-  }
-
-  /* ---- SEPARATOR ---- */
-  .sep {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 3rem 0;
-  }
-
-  /* ---- INTERACTIVE TOOL SECTION ---- */
-  .tool-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .tool-header h2 {
-    font-weight: 300;
-    font-size: 1.6rem;
-    color: var(--text-bright);
-    margin-bottom: 0.3rem;
-  }
-
-  .tool-header .subtitle {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-  }
-
-  /* Knot selector */
-  .knot-selector {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .knot-btn {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1rem;
-    padding: 0.55rem 1.3rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.25s ease;
-    letter-spacing: 0.02em;
-  }
-
-  .knot-btn:hover {
-    border-color: var(--accent-poly);
-    color: var(--text);
-  }
-
-  .knot-btn.active {
-    background: var(--surface2);
-    border-color: var(--accent-poly);
-    color: var(--accent-poly);
-    box-shadow: 0 0 12px rgba(196,160,232,0.1);
-  }
-
-  .knot-desc {
-    text-align: center;
-    font-size: 0.95rem;
-    color: var(--text-dim);
-    margin-bottom: 1.5rem;
-    font-style: italic;
-    min-height: 2.5em;
-  }
-
-  .instructions {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    text-align: center;
-    margin-bottom: 1.25rem;
-    letter-spacing: 0.04em;
-  }
-
-  .instructions kbd {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 1px 5px;
-    border-radius: 2px;
-    font-size: 0.6rem;
-  }
-
-  /* Main layout */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  @media (max-width: 860px) {
-    .main-grid { grid-template-columns: 1fr; }
-  }
-
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1.25rem;
-  }
-
-  .panel-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* Crossing diagram */
-  .crossing-diagram {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    min-height: 120px;
-    align-items: center;
-  }
-
-  .crossing-box {
-    position: relative;
-    width: 100px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .crossing-box:hover { transform: scale(1.08); }
-
-  .crossing-box canvas { width: 100%; height: 100px; }
-
-  .crossing-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6rem;
-    text-align: center;
-    color: var(--text-dim);
-    margin-top: 4px;
-    letter-spacing: 0.05em;
-  }
-
-  .smoothing-type {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    text-align: center;
-    margin-top: 2px;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-
-  .smoothing-type.type-a { color: var(--accent-a); }
-  .smoothing-type.type-b { color: var(--accent-b); }
-
-  /* Loop canvas */
-  .loop-canvas-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-  }
-
-  #loopCanvas { border-radius: 3px; }
-
-  /* State table */
-  .state-table-wrap {
-    max-height: 420px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .state-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-  }
-
-  .state-table th {
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    color: var(--text-dim);
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.6rem;
-    padding: 0.5rem 0.4rem;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-  }
-
-  .state-table td {
-    padding: 0.4rem 0.4rem;
-    border-bottom: 1px solid rgba(42,47,61,0.5);
-    vertical-align: middle;
-  }
-
-  .state-table tr { transition: background 0.15s; cursor: pointer; }
-  .state-table tr:hover { background: rgba(196,160,232,0.04); }
-  .state-table tr.active-state { background: rgba(196,160,232,0.08); }
-  .state-table tr.active-state td { color: var(--accent-poly); }
-
-  .state-bits { display: inline-flex; gap: 2px; }
-
-  .bit {
-    display: inline-block;
-    width: 16px; height: 16px;
-    line-height: 16px;
-    text-align: center;
-    border-radius: 2px;
-    font-size: 0.6rem;
-    font-weight: 500;
-  }
-
-  .bit-a { background: rgba(91,155,213,0.15); color: var(--accent-a); }
-  .bit-b { background: rgba(212,132,90,0.15); color: var(--accent-b); }
-
-  .loops-badge {
-    display: inline-block;
-    background: rgba(123,199,123,0.12);
-    color: var(--accent-loop);
-    padding: 1px 6px;
-    border-radius: 2px;
-  }
-
-  /* Result polynomial */
-  .result-panel { grid-column: 1 / -1; }
-
-  .polynomial-display {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.3rem;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    line-height: 1.8;
-    letter-spacing: 0.01em;
-    word-break: break-word;
-  }
-
-  .polynomial-display .coeff-pos { color: var(--positive); }
-  .polynomial-display .coeff-neg { color: var(--negative); }
-  .polynomial-display .var-a { color: var(--accent-poly); font-style: italic; }
-  .polynomial-display .sup { font-size: 0.8em; vertical-align: super; }
-
-  .info-row {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    margin-top: 0.5rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    flex-wrap: wrap;
-  }
-
-  .info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
-  .info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-  .dot-a { background: var(--accent-a); }
-  .dot-b { background: var(--accent-b); }
-  .dot-loop { background: var(--accent-loop); }
-  .dot-poly { background: var(--accent-poly); }
-
-  /* Accumulation */
-  .accum-controls {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem 0 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .accum-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    padding: 0.4rem 1rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.2s;
-    letter-spacing: 0.03em;
-  }
-
-  .accum-btn:hover { border-color: var(--accent-poly); color: var(--text); }
-  .accum-btn.active-play { border-color: var(--accent-loop); color: var(--accent-loop); }
-
-  .accum-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-  }
-
-  .running-sum {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.1rem;
-    text-align: center;
-    padding: 0.5rem;
-    min-height: 2em;
-    color: var(--highlight);
-  }
-
-  .running-sum .coeff-pos { color: var(--positive); }
-  .running-sum .coeff-neg { color: var(--negative); }
-  .running-sum .var-a { color: var(--accent-poly); font-style: italic; }
-  .running-sum .sup { font-size: 0.8em; vertical-align: super; }
-
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .panel { animation: fadeIn 0.4s ease both; }
-  .panel:nth-child(2) { animation-delay: 0.1s; }
-
-  /* TOC sidebar hint */
-  .toc {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .toc-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.6rem;
-  }
-
-  .toc a {
-    display: block;
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 0.92rem;
-    padding: 0.2rem 0;
-    transition: color 0.2s;
-  }
-
-  .toc a:hover { color: var(--accent-poly); }
-  .toc a .num { color: var(--accent-poly); font-style: italic; margin-right: 0.4rem; }
-</style>
+<link rel="stylesheet" href="shared.css">
+<script src="web-components.js"></script>
 </head>
 <body>
 <div class="container">
@@ -624,10 +78,9 @@
 
     <p>For example, the trefoil has 3 crossings and 6 arcs. Its PD notation is:</p>
 
-    <div class="formula-box">
-      <span class="label">Trefoil — PD notation</span>
+    <formula-box label="Trefoil — PD notation">
       X[0,4,1,3] &nbsp;&nbsp; X[2,0,3,5] &nbsp;&nbsp; X[4,2,5,1]
-    </div>
+    </formula-box>
 
     <p>Each bracket lists the four arc numbers at that crossing. Notice that every arc number appears exactly twice across all the crossings — once where it enters a crossing and once where it leaves another. This is how the crossings are "wired together" into a continuous loop. The figure-eight knot has 4 crossings and 8 arcs; the Hopf link has 2 crossings and 4 arcs.</p>
   </div>
@@ -640,15 +93,13 @@
 
     <p>But here is the crucial point: there are <em>two different ways</em> to reconnect the strands. Imagine you are standing at the crossing looking at the four arcs coming in. You can pair them up two ways — and each way produces a different reconnection:</p>
 
-    <div class="step-box">
-      <div class="step-num"><span class="color-a">A-smoothing</span></div>
+    <step-box label="A-smoothing">
       <p>Connect arc 0 with arc 3, and arc 1 with arc 2. Visually, this joins the strands into two curves that "pass by" each other horizontally.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num"><span class="color-b">B-smoothing</span></div>
+    <step-box label="B-smoothing">
       <p>Connect arc 0 with arc 1, and arc 2 with arc 3. This joins the strands the other way — they "bounce back" on themselves vertically.</p>
-    </div>
+    </step-box>
 
     <div class="figure">
       <canvas id="figSmoothing" width="600" height="180"></canvas>
@@ -681,31 +132,27 @@
 
     <p>Each state contributes a term to the sum. The contribution depends on two things:</p>
 
-    <div class="step-box">
-      <div class="step-num">Weight from smoothing choices</div>
+    <step-box label="Weight from smoothing choices">
       <p>If a state uses <em>a</em> A-smoothings and <em>b</em> B-smoothings, its weight is <span class="key-term"><em>A</em><sup>(a−b)</sup></span>. Each A-smoothing contributes a factor of <em>A</em>, each B-smoothing a factor of <em>A</em><sup>−1</sup>. So a state with all A-smoothings has the highest positive power of <em>A</em>, and a state with all B-smoothings has the most negative power. This is how the variable <em>A</em> encodes which smoothing choices were made.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Loop factor</div>
+    <step-box label="Loop factor">
       <p>Each simple loop in the resolved diagram is "worth" a factor of <span class="key-term">d = −A² − A⁻²</span>. If there are <em>ℓ</em> loops, the loop factor is <em>d</em><sup>ℓ−1</sup>. (Why <em>ℓ</em>−1 instead of <em>ℓ</em>? The first loop is "free" — it comes from the normalization convention that the unknot, a single circle, has bracket equal to 1 rather than <em>d</em>.) The value of <em>d</em> is not arbitrary — it is the unique value that makes the bracket invariant under certain diagram rearrangements called Reidemeister moves.</p>
-    </div>
+    </step-box>
 
-    <div class="formula-box">
-      <span class="label">Kauffman Bracket</span>
+    <formula-box label="Kauffman Bracket">
       ⟨K⟩ &nbsp;=&nbsp; <span style="font-size:1.5em">Σ</span><sub style="font-size:0.7em">states s</sub> &nbsp;
       <span class="var-a">A</span><sup>(#A − #B)</sup> · (−<span class="var-a">A</span><sup>2</sup> − <span class="var-a">A</span><sup>−2</sup>)<sup>(loops−1)</sup>
-    </div>
+    </formula-box>
 
     <p>Because the variable <em>A</em> can have both positive and negative exponents (like <em>A</em><sup>−7</sup>), the result is a <span class="key-term">Laurent polynomial</span>. A regular polynomial has only non-negative powers (like 3<em>x</em>² + <em>x</em> + 5). A Laurent polynomial extends this to include negative powers too (like <em>A</em><sup>−7</sup> + <em>A</em><sup>5</sup>). All the coefficients turn out to be integers, which is remarkable — despite all the intermediate computation, the final answer is always clean.</p>
 
     <p>The bracket is <em>almost</em> a full knot invariant on its own. It can change by a factor under one particular type of diagram rearrangement (adding or removing a twist). To correct for this, we account for the <span class="key-term">writhe</span> — each crossing has a sign (+1 or −1, determined by the orientation of the strands), and the writhe is their sum. Dividing out the writhe-dependent factor gives the <span class="key-term">Jones polynomial</span> (or rather, Kauffman's version of it in the variable <em>A</em>):</p>
 
-    <div class="formula-box">
-      <span class="label">Jones polynomial (Kauffman's f-polynomial)</span>
+    <formula-box label="Jones polynomial (Kauffman's f-polynomial)">
       f(K) &nbsp;=&nbsp; (−<span class="var-a">A</span><sup>3</sup>)<sup>−w</sup> · ⟨K⟩
       <br><span style="font-size:0.85rem;color:var(--text-dim);">where w = writhe = sum of crossing signs</span>
-    </div>
+    </formula-box>
 
     <p>This <em>f</em>-polynomial is a true knot invariant: it does not depend on how you draw the diagram at all. It only depends on the knot itself. The Jones polynomial was originally discovered by Vaughan Jones in 1984 through a completely different route (via operator algebras in quantum mechanics); Kauffman's bracket gives a beautifully elementary way to compute it using nothing more than counting loops and doing polynomial arithmetic.</p>
   </div>
@@ -716,30 +163,25 @@
 
     <p>The C89 program implements this entire computation from scratch, with zero dependencies — just pure arithmetic and loop-counting. Here is what each part handles:</p>
 
-    <div class="step-box">
-      <div class="step-num">Laurent polynomials</div>
+    <step-box label="Laurent polynomials">
       <p>The code defines a <code>Poly</code> type that stores an array of integer coefficients and a lowest exponent. For instance, the polynomial <em>A</em><sup>−3</sup> + 2<em>A</em><sup>5</sup> would be stored as coefficients [1, 0, 0, 0, 0, 0, 0, 0, 2] starting at exponent −3. Addition and multiplication follow the standard rules of polynomial algebra — the same rules you learned in school, just extended to handle negative exponents. This data structure is the workhorse: all the bookkeeping of "collect like terms in <em>A</em>" is handled here.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Knot diagrams</div>
+    <step-box label="Knot diagrams">
       <p>Each knot is stored as an array of crossings in PD notation — exactly the arc-label lists described in section 3. The trefoil, figure-eight, and Hopf link are hard-coded from the standard Knot Atlas database. Each crossing also stores its sign (+1 or −1) for computing the writhe.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Loop counting</div>
+    <step-box label="Loop counting">
       <p>This is the topological heart of the computation. For a given state (a specific smoothing choice at every crossing), the code builds a <em>pairing table</em>: at each crossing, it records which arc gets connected to which. Then it traces through these connections — start at any arc, follow the pairing to a partner arc, jump to that arc's other crossing, follow the pairing there, and so on, until you return to where you started. That is one loop. Repeat for any unvisited arcs to find all the loops. The result is just a count: how many independent closed loops did this state produce?</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">State sum</div>
+    <step-box label="State sum">
       <p>The main computation: loop over all 2<sup>n</sup> states (using a simple integer counter where each bit represents A=0 or B=1 at that crossing). For each state, compute the weight <em>A</em><sup>(#A−#B)</sup>, count the loops, raise <em>d</em> to the appropriate power, multiply them into a polynomial term, and add it to the running total. When done, the accumulated sum is the Kauffman bracket ⟨K⟩.</p>
-    </div>
+    </step-box>
 
-    <div class="step-box">
-      <div class="step-num">Verification</div>
+    <step-box label="Verification">
       <p>The program checks its computed results against known values from the mathematical literature. The trefoil's bracket matches Kauffman's published result. The figure-eight's bracket is <em>palindromic</em> (its coefficients read the same forwards and backwards) — this reflects the remarkable fact that the figure-eight knot is <em>amphichiral</em>: it is equivalent to its own mirror image, the only knot with 4 or fewer crossings that has this property. The Hopf link bracket is correct. And crucially, the trefoil and figure-eight have <em>different</em> brackets, confirming that the invariant successfully distinguishes them. All 9 tests pass.</p>
-    </div>
+    </step-box>
 
     <p class="dim">The interactive tool below is a direct JavaScript port of this C code — the same polynomial arithmetic, the same loop-counting algorithm, the same PD data. The results match exactly.</p>
   </div>
@@ -753,56 +195,35 @@
       <div class="subtitle">Choose a knot, toggle smoothings, watch the bracket assemble</div>
     </div>
 
-    <div class="knot-selector">
-      <button class="knot-btn active" data-knot="trefoil">Trefoil 3₁</button>
-      <button class="knot-btn" data-knot="figure-eight">Figure-Eight 4₁</button>
-      <button class="knot-btn" data-knot="hopf">Hopf Link</button>
-    </div>
+    <selector-bar value="trefoil">
+      <button value="trefoil">Trefoil 3₁</button>
+      <button value="figure-eight">Figure-Eight 4₁</button>
+      <button value="hopf">Hopf Link</button>
+    </selector-bar>
 
-    <div class="knot-desc" id="knotDesc">The simplest non-trivial knot: 3 crossings, all positive. Writhe = +3.</div>
+    <div class="selector-desc" id="knotDesc">The simplest non-trivial knot: 3 crossings, all positive. Writhe = +3.</div>
 
     <div class="instructions">
       Click each crossing to toggle <kbd>A</kbd> ↔ <kbd>B</kbd> smoothing. Click a row in the state table to jump to that state.
     </div>
 
     <div class="main-grid">
-      <div class="panel">
-        <div class="panel-title">Crossings — click to toggle smoothing</div>
+      <panel-card panel-title="Crossings — click to toggle smoothing">
         <div class="crossing-diagram" id="crossingDiagram"></div>
         <div style="margin-top:1.25rem;">
-          <div class="panel-title">Resulting loops for this state</div>
+          <div class="kn-panel-title">Resulting loops for this state</div>
           <div class="loop-canvas-wrap">
             <canvas id="loopCanvas" width="360" height="220"></canvas>
           </div>
         </div>
-      </div>
+      </panel-card>
 
-      <div class="panel">
-        <div class="panel-title">All 2<sup style="font-size:0.5rem">n</sup> states — contributions to ⟨K⟩</div>
-        <div class="state-table-wrap">
-          <table class="state-table" id="stateTable">
-            <thead><tr>
-              <th>#</th>
-              <th>Smoothings</th>
-              <th>Loops</th>
-              <th>Weight</th>
-              <th>Contribution</th>
-            </tr></thead>
-            <tbody id="stateBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <panel-card panel-title="All 2&lt;sup&gt;n&lt;/sup&gt; states — contributions to ⟨K⟩">
+        <state-table id="stateTable"></state-table>
+      </panel-card>
 
-      <div class="panel result-panel">
-        <div class="panel-title">Results</div>
-
-        <div class="accum-controls">
-          <button class="accum-btn" id="btnReset" title="Reset to state 0">⟲ Reset</button>
-          <button class="accum-btn" id="btnPrev" title="Previous state">◂ Prev</button>
-          <button class="accum-btn" id="btnNext" title="Next state">Next ▸</button>
-          <button class="accum-btn" id="btnPlay" title="Auto-play through states">▶ Play</button>
-          <span class="accum-label" id="accumLabel">State 0 / 7</span>
-        </div>
+      <panel-card panel-title="Results" class="full-width">
+        <accum-controls id="accumControls" current="0" total="7"></accum-controls>
         <div class="running-sum" id="runningSum"></div>
 
         <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
@@ -821,77 +242,13 @@
           <span><span class="dot dot-loop"></span> loop count</span>
           <span><span class="dot dot-poly"></span> bracket</span>
         </div>
-      </div>
+      </panel-card>
     </div>
   </div>
 
 </div>
 
 <script>
-/* ============================================================
- * POLYNOMIAL ARITHMETIC
- * ============================================================ */
-function Poly(c, lo) { this.c = c ? c.slice() : []; this.lo = lo || 0; }
-Poly.zero = function() { return new Poly([], 0); };
-Poly.mono = function(coeff, exp) {
-  if (coeff === 0) return Poly.zero();
-  return new Poly([coeff], exp);
-};
-Poly.prototype.trim = function() {
-  var a = 0, b = this.c.length - 1;
-  while (a <= b && this.c[a] === 0) a++;
-  if (a > b) { this.c = []; this.lo = 0; return this; }
-  while (b > a && this.c[b] === 0) b--;
-  this.c = this.c.slice(a, b + 1);
-  this.lo += a;
-  return this;
-};
-function polyAdd(a, b) {
-  if (!a.c.length) return new Poly(b.c, b.lo);
-  if (!b.c.length) return new Poly(a.c, a.lo);
-  var lo = Math.min(a.lo, b.lo);
-  var hi = Math.max(a.lo+a.c.length-1, b.lo+b.c.length-1);
-  var c = new Array(hi-lo+1); var i;
-  for (i=0;i<c.length;i++) c[i]=0;
-  for (i=0;i<a.c.length;i++) c[a.lo+i-lo]+=a.c[i];
-  for (i=0;i<b.c.length;i++) c[b.lo+i-lo]+=b.c[i];
-  return new Poly(c,lo).trim();
-}
-function polyMul(a, b) {
-  if (!a.c.length||!b.c.length) return Poly.zero();
-  var len=a.c.length+b.c.length-1;
-  var c=new Array(len); var i,j;
-  for(i=0;i<len;i++) c[i]=0;
-  for(i=0;i<a.c.length;i++) for(j=0;j<b.c.length;j++) c[i+j]+=a.c[i]*b.c[j];
-  return new Poly(c,a.lo+b.lo).trim();
-}
-function polyEq(a,b) {
-  if(a.c.length!==b.c.length) return false;
-  if(!a.c.length) return true;
-  if(a.lo!==b.lo) return false;
-  for(var i=0;i<a.c.length;i++) if(a.c[i]!==b.c[i]) return false;
-  return true;
-}
-function polyToHTML(p) {
-  if (!p.c.length) return '<span class="coeff-pos">0</span>';
-  var parts = [];
-  for (var i=0;i<p.c.length;i++) {
-    if (p.c[i]===0) continue;
-    var e=p.lo+i, coeff=p.c[i], s='';
-    if (parts.length>0) s += coeff>0 ? ' + ' : ' − ';
-    else if (coeff<0) s += '−';
-    var ac=Math.abs(coeff);
-    var cls = coeff>0 ? 'coeff-pos' : 'coeff-neg';
-    if (parts.length>0) cls = coeff>0?'coeff-pos':'coeff-neg';
-    if (ac!==1||e===0) s+=ac;
-    if (e===1) s+='<span class="var-a">A</span>';
-    else if (e===-1) s+='<span class="var-a">A</span><span class="sup">−1</span>';
-    else if (e!==0) s+='<span class="var-a">A</span><span class="sup">'+e+'</span>';
-    parts.push('<span class="'+cls+'">'+s+'</span>');
-  }
-  return parts.join('');
-}
-
 /* ============================================================
  * KNOT DEFINITIONS
  * ============================================================ */
@@ -959,8 +316,6 @@ function countLoops(knot, state) {
 /* ============================================================
  * BRACKET COMPUTATION
  * ============================================================ */
-var D_POLY=polyAdd(Poly.mono(-1,2),Poly.mono(-1,-2));
-
 function kauffmanBracket(knot){
   var result=Poly.zero(), n=knot.n, ns=1<<n, states=[];
   for(var s=0;s<ns;s++){
@@ -1225,36 +580,9 @@ function buildCrossingDiagram(){
 function buildStateTable(){
   var knot=KNOTS[currentKnot];
   cachedResult=kauffmanBracket(knot);
-  var states=cachedResult.states;
-  var tbody=document.getElementById('stateBody');
-  tbody.innerHTML='';
-  var cs=currentState();
-  for(var s=0;s<states.length;s++){
-    var st=states[s],tr=document.createElement('tr');
-    if(st.index===cs) tr.className='active-state';
-    var td0=document.createElement('td');td0.textContent='#'+st.index;td0.style.color='var(--text-dim)';tr.appendChild(td0);
-    var td1=document.createElement('td');
-    var bits=document.createElement('span');bits.className='state-bits';
-    for(var b=0;b<knot.n;b++){
-      var bit=document.createElement('span');
-      bit.className='bit '+(((st.index>>b)&1)?'bit-b':'bit-a');
-      bit.textContent=((st.index>>b)&1)?'B':'A';bits.appendChild(bit);
-    }
-    td1.appendChild(bits);tr.appendChild(td1);
-    var td2=document.createElement('td');
-    var badge=document.createElement('span');badge.className='loops-badge';badge.textContent=st.loops;
-    td2.appendChild(badge);tr.appendChild(td2);
-    var td3=document.createElement('td');
-    td3.innerHTML='A<sup style="font-size:0.6rem">'+st.weightExp+'</sup>\u00b7d<sup style="font-size:0.6rem">'+(st.loops-1)+'</sup>';
-    tr.appendChild(td3);
-    var td4=document.createElement('td');td4.innerHTML=polyToHTML(st.contribution);td4.style.fontSize='0.68rem';
-    tr.appendChild(td4);
-    tr.addEventListener('click',(function(idx,nn){return function(){
-      for(var b=0;b<nn;b++) smoothings[b]=(idx>>b)&1;
-      accumStep=idx;updateAll();
-    };})(st.index,knot.n));
-    tbody.appendChild(tr);
-  }
+  var st=document.getElementById('stateTable');
+  st.data={crossingCount:knot.n,states:cachedResult.states};
+  st.activeState=currentState();
 }
 
 function updateAll(){
@@ -1268,17 +596,16 @@ function updateAll(){
     else{stype.className='smoothing-type type-a';stype.textContent='A-smoothing';}
   }
   drawLoops(knot,currentState());
-  var rows=document.querySelectorAll('#stateBody tr'),cs=currentState();
-  for(var r=0;r<rows.length;r++) rows[r].className=(r===cs)?'active-state':'';
+  document.getElementById('stateTable').activeState=currentState();
   updateAccumDisplay();
 }
 
 function updateAccumDisplay(){
   var knot=KNOTS[currentKnot];
   var ns=1<<knot.n;
-  var label=document.getElementById('accumLabel');
-  label.textContent='State '+accumStep+' / '+(ns-1);
-  /* Running sum up to accumStep */
+  var ac=document.getElementById('accumControls');
+  ac.current=accumStep;
+  ac.total=ns-1;
   var running=Poly.zero();
   for(var i=0;i<=accumStep&&i<cachedResult.states.length;i++){
     running=polyAdd(running,cachedResult.states[i].contribution);
@@ -1302,12 +629,12 @@ function renderResult(){
 }
 
 function selectKnot(name){
-  if(playInterval){clearInterval(playInterval);playInterval=null;document.getElementById('btnPlay').classList.remove('active-play');document.getElementById('btnPlay').textContent='▶ Play';}
+  if(playInterval){clearInterval(playInterval);playInterval=null;
+    document.getElementById('accumControls').playing=false;}
   currentKnot=name;
   var knot=KNOTS[name];
   smoothings=[];for(var i=0;i<knot.n;i++) smoothings.push(0);
   accumStep=0;
-  document.querySelectorAll('.knot-btn').forEach(function(b){b.classList.toggle('active',b.dataset.knot===name);});
   document.getElementById('knotDesc').textContent=knot.desc;
   buildCrossingDiagram();
   buildStateTable();
@@ -1315,13 +642,26 @@ function selectKnot(name){
   updateAll();
 }
 
+/* Selector bar */
+document.querySelector('selector-bar').addEventListener('change',function(e){
+  selectKnot(e.detail.value);
+});
+
+/* State table row clicks */
+document.getElementById('stateTable').addEventListener('state-select',function(e){
+  var idx=e.detail.index,knot=KNOTS[currentKnot];
+  for(var b=0;b<knot.n;b++) smoothings[b]=(idx>>b)&1;
+  accumStep=idx;updateAll();
+});
+
 /* Accumulation controls */
-document.getElementById('btnReset').addEventListener('click',function(){
+var accumEl=document.getElementById('accumControls');
+accumEl.addEventListener('accum-reset',function(){
   accumStep=0;
   for(var i=0;i<smoothings.length;i++) smoothings[i]=0;
   updateAll();
 });
-document.getElementById('btnPrev').addEventListener('click',function(){
+accumEl.addEventListener('accum-prev',function(){
   if(accumStep>0){
     accumStep--;
     var knot=KNOTS[currentKnot];
@@ -1329,7 +669,7 @@ document.getElementById('btnPrev').addEventListener('click',function(){
     updateAll();
   }
 });
-document.getElementById('btnNext').addEventListener('click',function(){
+accumEl.addEventListener('accum-next',function(){
   var ns=1<<KNOTS[currentKnot].n;
   if(accumStep<ns-1){
     accumStep++;
@@ -1338,29 +678,22 @@ document.getElementById('btnNext').addEventListener('click',function(){
     updateAll();
   }
 });
-document.getElementById('btnPlay').addEventListener('click',function(){
-  var btn=this;
-  if(playInterval){
-    clearInterval(playInterval);playInterval=null;
-    btn.classList.remove('active-play');btn.textContent='▶ Play';return;
-  }
+accumEl.addEventListener('accum-play',function(){
   var ns=1<<KNOTS[currentKnot].n;
   accumStep=0;
   for(var i=0;i<smoothings.length;i++) smoothings[i]=0;
   updateAll();
-  btn.classList.add('active-play');btn.textContent='⏸ Pause';
   playInterval=setInterval(function(){
-    if(accumStep>=ns-1){clearInterval(playInterval);playInterval=null;btn.classList.remove('active-play');btn.textContent='▶ Play';return;}
+    if(accumStep>=ns-1){clearInterval(playInterval);playInterval=null;
+      accumEl.playing=false;return;}
     accumStep++;
     var knot=KNOTS[currentKnot];
     for(var b=0;b<knot.n;b++) smoothings[b]=(accumStep>>b)&1;
     updateAll();
   },800);
 });
-
-/* Knot buttons */
-document.querySelectorAll('.knot-btn').forEach(function(btn){
-  btn.addEventListener('click',function(){selectKnot(this.dataset.knot);});
+accumEl.addEventListener('accum-pause',function(){
+  if(playInterval){clearInterval(playInterval);playInterval=null;}
 });
 
 /* Init */

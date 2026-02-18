@@ -1,0 +1,4 @@
+- we are only doing vanilla js
+- when we do web components no shadow dom
+- no dependencies on 3rd party javascript libraries or anything like that
+- we can use THREE.js but ideally just from a cdn or download it as a single bundled file, don't want to use node_modules folder, package.json or anything

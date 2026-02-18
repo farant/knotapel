@@ -1,0 +1,675 @@
+/* shared.css — Common theme, variables, and base styles for Knotapel demos
+ *
+ * Include before any per-demo styles:
+ *   <link rel="stylesheet" href="shared.css">
+ *
+ * Per-demo customization:
+ *   Set --accent on <body> or any subtree to change the primary accent.
+ *   e.g. body { --accent: var(--accent-braid); }
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+/* ==========================================================================
+ * COLOR TOKENS
+ * ========================================================================== */
+
+:root {
+  /* Surfaces */
+  --bg:        #0c0e13;
+  --surface:   #14171e;
+  --surface2:  #1a1e28;
+  --surface3:  #1f2433;
+  --border:    #2a2f3d;
+
+  /* Text */
+  --text:        #d4d8e4;
+  --text-dim:    #6b7394;
+  --text-bright: #eef0f6;
+  --link:        #8bb8e0;
+
+  /* Semantic accents */
+  --accent-a:     #5b9bd5;   /* A-smoothing blue */
+  --accent-b:     #d4845a;   /* B-smoothing orange */
+  --accent-loop:  #7bc77b;   /* loop-count green */
+  --accent-poly:  #c4a0e8;   /* polynomial / bracket purple */
+  --accent-braid: #e8c86a;   /* braid-word gold */
+  --accent-tl:    #e07070;   /* Temperley-Lieb red */
+
+  /* Status */
+  --highlight:  #f0d060;
+  --negative:   #e06070;
+  --positive:   #60c080;
+
+  /* Default accent (override per-demo on body or subtree) */
+  --accent: var(--accent-poly);
+}
+
+/* ==========================================================================
+ * RESET & BASE
+ * ========================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* Subtle radial gradient overlay — override per demo if desired */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(91,155,213,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(196,160,232,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==========================================================================
+ * LAYOUT
+ * ========================================================================== */
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 860px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 3rem 0;
+}
+
+/* ==========================================================================
+ * HEADER
+ * ========================================================================== */
+
+header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-weight: 300;
+  font-size: 2.4rem;
+  letter-spacing: 0.03em;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+
+header h1 em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+header .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+header .demo-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  border: 1px solid currentColor;
+  opacity: 0.7;
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  letter-spacing: 0.1em;
+}
+
+/* ==========================================================================
+ * PROSE SECTIONS
+ * ========================================================================== */
+
+.prose { margin-bottom: 2.5rem; }
+
+.prose h2 {
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--text-bright);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.prose h2 .num {
+  color: var(--accent);
+  font-style: italic;
+  margin-right: 0.3rem;
+}
+
+.prose h3 {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose p       { margin-bottom: 1rem; color: var(--text); }
+.prose p.dim   { color: var(--text-dim); font-style: italic; }
+
+/* ==========================================================================
+ * INLINE TEXT HELPERS
+ * ========================================================================== */
+
+.key-term       { color: var(--accent); font-weight: 500; }
+.key-term-poly  { color: var(--accent-poly); font-weight: 500; }
+.key-term-braid { color: var(--accent-braid); font-weight: 500; }
+
+.color-a    { color: var(--accent-a); }
+.color-b    { color: var(--accent-b); }
+.color-loop { color: var(--accent-loop); }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  color: var(--accent-poly);
+}
+
+/* ==========================================================================
+ * TABLE OF CONTENTS
+ * ========================================================================== */
+
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.toc a {
+  display: block;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+  padding: 0.2rem 0;
+  transition: color 0.2s;
+}
+
+.toc a:hover   { color: var(--accent); }
+.toc a .num    { color: var(--accent); font-style: italic; margin-right: 0.4rem; }
+
+/* ==========================================================================
+ * RECAP BOX (Demos 2 & 3)
+ * ========================================================================== */
+
+.recap-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.recap-box .recap-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.recap-box p            { margin-bottom: 0.75rem; color: var(--text); font-size: 0.95rem; }
+.recap-box p:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
+ * FIGURES
+ * ========================================================================== */
+
+.figure {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.25rem;
+  margin: 1.25rem 0 1.5rem;
+  text-align: center;
+}
+
+.figure canvas { display: block; margin: 0 auto; }
+
+.figure-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-top: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+ * TOOL HEADER (above interactive sections)
+ * ========================================================================== */
+
+.tool-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.tool-header h2 {
+  font-weight: 300;
+  font-size: 1.6rem;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+
+.tool-header .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+/* ==========================================================================
+ * INSTRUCTIONS HINT
+ * ========================================================================== */
+
+.instructions {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.instructions kbd {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.6rem;
+}
+
+/* ==========================================================================
+ * POLYNOMIAL DISPLAY (standalone, outside <poly-display> component)
+ * ========================================================================== */
+
+.polynomial-display {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.3rem;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+.polynomial-display .coeff-pos { color: var(--positive); }
+.polynomial-display .coeff-neg { color: var(--negative); }
+.polynomial-display .var-a     { color: var(--accent-poly); font-style: italic; }
+.polynomial-display .sup       { font-size: 0.8em; vertical-align: super; }
+
+/* ==========================================================================
+ * RUNNING SUM
+ * ========================================================================== */
+
+.running-sum {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 0.5rem;
+  min-height: 2em;
+  color: var(--highlight);
+}
+
+.running-sum .coeff-pos { color: var(--positive); }
+.running-sum .coeff-neg { color: var(--negative); }
+.running-sum .var-a     { color: var(--accent-poly); font-style: italic; }
+.running-sum .sup       { font-size: 0.8em; vertical-align: super; }
+
+/* ==========================================================================
+ * INFO LEGEND ROW
+ * ========================================================================== */
+
+.info-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+
+.info-row span { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+.info-row .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot-a     { background: var(--accent-a); }
+.dot-b     { background: var(--accent-b); }
+.dot-loop  { background: var(--accent-loop); }
+.dot-poly  { background: var(--accent-poly); }
+.dot-braid { background: var(--accent-braid); }
+.dot-tl    { background: var(--accent-tl); }
+
+/* ==========================================================================
+ * CROSSING DIAGRAM (interactive crossing toggles, Demos 1 & 2)
+ * ========================================================================== */
+
+.crossing-diagram {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 120px;
+  align-items: center;
+}
+
+.crossing-box {
+  position: relative;
+  width: 100px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.crossing-box:hover { transform: scale(1.08); }
+.crossing-box canvas { width: 100%; height: 100px; }
+
+.crossing-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-align: center;
+  color: var(--text-dim);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+.smoothing-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-align: center;
+  margin-top: 2px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.smoothing-type.type-a { color: var(--accent-a); }
+.smoothing-type.type-b { color: var(--accent-b); }
+
+/* ==========================================================================
+ * LOOP CANVAS
+ * ========================================================================== */
+
+.loop-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 180px;
+}
+
+/* ==========================================================================
+ * BRAID-SPECIFIC (Demos 2 & 3)
+ * ========================================================================== */
+
+.braid-word-display {
+  text-align: center;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.braid-word {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.4rem;
+  color: var(--text-bright);
+  letter-spacing: 0.05em;
+}
+
+.braid-word .sigma     { color: var(--accent-braid); }
+.braid-word .sigma-neg { color: var(--accent-b); }
+.braid-word sup        { font-size: 0.65em; }
+.braid-word .sep-dot   { color: var(--text-dim); margin: 0 0.15em; }
+
+.braid-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 280px;
+}
+
+/* ==========================================================================
+ * VERIFY BADGE (Demo 3)
+ * ========================================================================== */
+
+.verify-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 2px;
+}
+
+.verify-pass {
+  background: rgba(96,192,128,0.1);
+  color: var(--positive);
+  border: 1px solid rgba(96,192,128,0.2);
+}
+
+.verify-fail {
+  background: rgba(224,96,112,0.1);
+  color: var(--negative);
+  border: 1px solid rgba(224,96,112,0.2);
+}
+
+/* ==========================================================================
+ * MATRIX DISPLAY (Demo 3)
+ * ========================================================================== */
+
+.mat-table {
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  margin: 0 auto;
+}
+
+.mat-table td {
+  padding: 0.3rem 0.6rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  min-width: 60px;
+  background: transparent;
+}
+
+.mat-table .mat-header {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  padding-bottom: 0.5rem;
+}
+
+.mat-bracket-left  { border-left:  2px solid var(--accent) !important; }
+.mat-bracket-right { border-right: 2px solid var(--accent) !important; }
+
+/* ==========================================================================
+ * MODULE CARDS (Demo 3)
+ * ========================================================================== */
+
+.module-cards {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  margin: 1rem 0;
+}
+
+.module-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem;
+}
+
+.module-card .module-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.module-plus {
+  font-size: 1.5rem;
+  color: var(--text-dim);
+  align-self: center;
+  padding-top: 1.5rem;
+}
+
+/* ==========================================================================
+ * COMPARISON PANEL (Demo 2)
+ * ========================================================================== */
+
+.comparison-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  align-items: center;
+}
+
+.compare-side { text-align: center; padding: 1rem; }
+
+.compare-side .compare-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.compare-side .compare-poly {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+}
+
+.compare-equals { font-size: 2rem; color: var(--accent-loop); padding: 0 1rem; }
+.compare-neq    { font-size: 2rem; color: var(--negative);     padding: 0 1rem; }
+
+/* ==========================================================================
+ * CHIRALITY ROW (Demo 2)
+ * ========================================================================== */
+
+.chirality-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.chirality-item {
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--surface2);
+  border-radius: 3px;
+}
+
+.chirality-arrow {
+  font-size: 1.5rem;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+ * STEP-BY-STEP DISPLAY (Demo 3)
+ * ========================================================================== */
+
+.step-display { margin: 1rem 0; }
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(42,47,61,0.5);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  transition: background 0.15s;
+}
+
+.step-item:hover       { background: rgba(255,255,255,0.02); }
+.step-item.active-step { background: rgba(255,255,255,0.04); }
+
+.step-item .step-label {
+  color: var(--accent);
+  min-width: 80px;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.step-item .step-op {
+  color: var(--text-dim);
+  min-width: 30px;
+  text-align: center;
+}
+
+/* ==========================================================================
+ * SELECTOR DESCRIPTION
+ * ========================================================================== */
+
+.selector-desc {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  min-height: 2.5em;
+}
+
+/* ==========================================================================
+ * ANIMATION
+ * ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
