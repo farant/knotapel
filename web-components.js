@@ -1135,16 +1135,29 @@
         colors: compCols,
         initialRadius: initialRadius,
         kRep: 0.02,
-        kBarrier: 0.5,
+        kBarrier: 1.0,
         kSpring: 0.3,
         kSmooth: 0.05,
         dt: 0.5,
-        maxDispClamp: 0.04,
-        stepsPerFrame: 10,
+        maxDispClamp: 0.02,
+        stepsPerFrame: 15,
+        repRampSteps: 300,
         resampleInterval: 50,
-        maxSteps: 5000,
-        convergenceThresh: 0.001
+        maxSteps: 8000,
+        convergenceThresh: 0.001,
+        paused: true
       };
+
+      /* Click to start relaxation */
+      var self = this;
+      this._relaxClickHandler = function () {
+        if (self._relaxState && self._relaxState.paused) {
+          self._relaxState.paused = false;
+          self._canvas.style.cursor = '';
+        }
+      };
+      this._canvas.addEventListener('click', this._relaxClickHandler);
+      this._canvas.style.cursor = 'pointer';
     }
 
     _stepRelax(n) {
@@ -1207,8 +1220,11 @@
           idx += cLen;
         }
 
-        /* Coulomb repulsion + barrier force O(N^2) */
-        var barrierDist = rs.tubeRadius * 4;
+        /* Coulomb repulsion + barrier force O(N^2)
+           Ramp up Coulomb gradually so the barrier can establish
+           safe separation before global repulsion spreads things out */
+        var repScale = Math.min(1.0, rs.totalSteps / rs.repRampSteps);
+        var barrierDist = rs.tubeRadius * 5;
         for (var i = 0; i < N; i++) {
           var ai = all[i];
           var pi = comps[ai.ci][ai.pi];
@@ -1227,9 +1243,11 @@
             var rawDistSq = dx * dx + dy * dy + dz * dz;
             var distSq = rawDistSq < 0.01 ? 0.01 : rawDistSq;
             var dist = Math.sqrt(distSq);
-            var f = rs.kRep / (distSq * dist);
 
-            /* Barrier: steep repulsion prevents strand crossing */
+            /* Coulomb: ramped up gradually */
+            var f = rs.kRep * repScale / (distSq * dist);
+
+            /* Barrier: always full strength, steep repulsion prevents crossing */
             var rawDist = Math.sqrt(rawDistSq > 0 ? rawDistSq : 0.0001);
             if (rawDist < barrierDist) {
               var pen = barrierDist - rawDist;
@@ -1364,6 +1382,11 @@
     }
 
     _clearRelax() {
+      if (this._relaxClickHandler && this._canvas) {
+        this._canvas.removeEventListener('click', this._relaxClickHandler);
+        this._relaxClickHandler = null;
+        this._canvas.style.cursor = '';
+      }
       if (this._relaxState) {
         this._relaxState.converged = true;
         this._relaxState = null;
@@ -1410,7 +1433,7 @@
         if (manualRotate && self._knotGroup) {
           self._knotGroup.rotation.y += 0.005 * rotSpeed;
         }
-        if (self._relaxState && !self._relaxState.converged) {
+        if (self._relaxState && !self._relaxState.converged && !self._relaxState.paused) {
           self._stepRelax(self._relaxState.stepsPerFrame);
           self._rebuildFromRelax();
         }

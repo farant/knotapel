@@ -44,10 +44,10 @@
   --text:        var(--dark-gray);
   --text-dim:    var(--mauve);
   --text-bright: var(--black);
-  --link:        var(--blue);
+  --link:        var(--dark-green);
 
   /* Semantic accents */
-  --accent-a:     var(--blue);          /* A-smoothing */
+  --accent-a:     var(--bright-green);  /* A-smoothing */
   --accent-b:     var(--dark-gold);     /* B-smoothing */
   --accent-loop:  var(--dark-green);    /* loop-count */
   --accent-poly:  var(--mauve);         /* polynomial / bracket */
